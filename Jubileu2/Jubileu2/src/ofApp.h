@@ -41,7 +41,7 @@ public:
 	
 	ofImage FundoMenu;
 
-	int estadoJogo = Menu;
+	int estadoJogo = GamePlay;
 
 	//personagem completo
 	struct personagem
@@ -50,16 +50,19 @@ public:
 		ofVec2f posicao;
 		ofVec2f vel;
 		ofImage sprite;
+		ofImage sprite2;
 		ofImage lifeBarPlayer;
 		ofImage lifePlayer;
 		float tamanhoX, tamanhoY, tamanhoXLife, tamanhoYLife;
 		float acele;
-		int vida = 300, pontos = 0;
+		int vida = 300, pontos = 0, dano = 1;
 		bool Up = false; bool Down = false; bool Right = false; bool Left = false; bool Tiro = false;
 		bool acompanhando = false; bool tiroDirecao = false;
+		
 	};
 	personagem player;
 	personagem fundo;
+	personagem PowerUp;
 
 	struct monstros
 
@@ -73,10 +76,13 @@ public:
 		float tamanhoX, tamanhoY, tamanhoXLife, tamanhoYLife;
 		float acele;
 		int vida = 300;
+		int powerUpRandon = (0 + (rand () % Ninimigo));
+		int powerUpRandon2 = (0 + (rand() % Ninimigo));
 		bool Tiro = false;
 		bool tiroDirecao = false; bool IniSub = false;
 		bool IniDesc = false;
 		bool IniDir = false; bool IniEsq = false; bool atingido = false;
+		bool powerUpActive = false;
 	};
 
 
@@ -89,10 +95,12 @@ public:
 		ofVec2f posicao;
 		ofVec2f vel;
 		ofImage sprite;
+		ofImage sprite2;
 		float tamanhoX, tamanhoY;
 		float acele;
 		bool Tiro = false;
 		bool acompanhando = false; bool Dir = false;
+		bool powerUpAtkActive = false;
 	};
 	//preciso mudar esse nome de variavel
 	golpes ataque;
@@ -104,16 +112,23 @@ public:
 	{
 		objeto.sprite.draw(objeto.posicao - mundo);
 	}
+	void desenhoPowerUp(personagem& objeto, ofVec2f mundo)
+	{
+		objeto.sprite2.draw(objeto.posicao - mundo);
+	}
 	void desenhoNaTelaTiro(golpes& objeto, ofVec2f& mundo)
 	{
-		objeto.sprite.draw(objeto.posicao - mundo);
+		if (objeto.powerUpAtkActive == false)
+			objeto.sprite.draw(objeto.posicao - mundo);
+		else
+			objeto.sprite2.draw(objeto.posicao - mundo);
 	}
 	void desenhoNaTelaMonstro(monstros& inimigo, ofVec2f& mundo)
 	{
 		
 		if (inimigo.atingido == false)
 			inimigo.sprite.draw(inimigo.posicao - mundo);
-		else
+		else 
 			inimigo.sprite2.draw(inimigo.posicao - mundo);
 	}
 
@@ -132,6 +147,20 @@ public:
 			P1.vida -= 2;
 		}
 	}
+
+	//colisao com powerUp
+	void colisaoPowerUp(personagem& P1, personagem& P2, golpes& tiro)
+	{
+
+		//Colisao certa
+		if (P1.posicao.x > P2.posicao.x - P2.tamanhoX && P1.posicao.x < P2.posicao.x + P2.tamanhoX &&
+			P1.posicao.y + P1.tamanhoY > P2.posicao.y - P2.tamanhoY &&
+			P1.posicao.y - P1.tamanhoY < P2.posicao.y + P2.tamanhoY)
+		{
+			tiro.powerUpAtkActive = true;
+			P1.dano = 2;
+		}
+	}
 	void colisaoTiro(monstros& T1, golpes& P1, personagem& P2)
 	{
 
@@ -142,10 +171,9 @@ public:
 		{
 			//Se colidir com objeto aumenta pontos, tira vida dos monstros e ativa a I.A 
 			P2.pontos += 5;
-			T1.vida - 5;
+			T1.vida -= P2.dano;
 			T1.atingido = true;
 			T1.IniDir = true;
-
 		}
 	}
 

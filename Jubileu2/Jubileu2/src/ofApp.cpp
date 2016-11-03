@@ -14,7 +14,8 @@ void ofApp::setup()
 		{
 			inimigo[i].EnemyBar.loadImage("players/LifeEnemyBar.png");
 			inimigo[i].EnemyLife.loadImage("players/LifeEnemy.png");
-			inimigo[i].EnemyLife.resize(3, inimigo[i].EnemyLife.getHeight());
+			inimigo[i].EnemyBar.resize(100, inimigo[i].EnemyBar.getHeight());
+			inimigo[i].EnemyLife.resize(20, inimigo[i].EnemyLife.getHeight());
 		}
 		
 
@@ -36,10 +37,16 @@ void ofApp::setup()
 		player.sprite.setAnchorPoint(player.sprite.getWidth() / 2, player.sprite.getHeight() / 2);
 		player.acele = 7.5f;
 
+		//definicoes powerUp
+		PowerUp.sprite2.loadImage("players/PowerUpForca.png");
+		PowerUp.sprite2.setAnchorPoint(PowerUp.sprite2.getWidth() / 2, PowerUp.sprite2.getHeight() / 2);
+		PowerUp.tamanhoY = PowerUp.sprite2.getHeight() / 2;
+		PowerUp.tamanhoX = PowerUp.sprite2.getWidth() / 2;
 
 		//definicoes padrao dos inimigos por vetores
 		for (int i = 0; i < Ninimigo; i++)
 		{
+			
 			inimigo[i].posicao.x = 700 + (rand() % 4072);
 			inimigo[i].posicao.y = 100 + (rand() % 450);
 			inimigo[i].sprite.loadImage("players/AlienVerde.png");
@@ -50,20 +57,23 @@ void ofApp::setup()
 			inimigo[i].tamanhoYLife = inimigo[i].EnemyLife.getHeight();
 			inimigo[i].sprite.setAnchorPoint(inimigo[i].sprite.getWidth() / 2, inimigo[i].sprite.getHeight() / 2);
 			inimigo[i].sprite2.setAnchorPoint(inimigo[i].sprite2.getWidth() / 2, inimigo[i].sprite2.getHeight() / 2);
-			inimigo[i].acele = 0.2f;
+			inimigo[i].acele = 0.8f;
 			inimigo[i].IniSub = true;
 			inimigo[i].vida = 30;
+
 		}
 
 
 
 		//definicoes do tiro
-		ataque.posicao.x = 450;
-		ataque.posicao.y = 500;
+		//ataque.posicao.x = 450;
+		//ataque.posicao.y = 500;
 		ataque.sprite.loadImage("players/armaPlayer.png");
+		ataque.sprite2.loadImage("players/armaPlayerUp1.png");
 		ataque.tamanhoX = ataque.sprite.getHeight() / 2;
 		ataque.tamanhoX = ataque.sprite.getWidth() / 2;
 		ataque.sprite.setAnchorPoint(ataque.sprite.getWidth() / 2, ataque.sprite.getHeight() / 2);
+		ataque.sprite2.setAnchorPoint(ataque.sprite2.getWidth() / 2, ataque.sprite2.getHeight() / 2);
 		ataque.acele = 950.0f;
 		ataque.acompanhando = true;
 
@@ -108,6 +118,8 @@ void ofApp::update()
 			//se a tecla for pressionada o player moviemnta e atira
 			movimento(player, ataque);
 
+			//colisao com o power up
+			colisaoPowerUp(player, PowerUp, ataque);
 
 			//ALEATORIEDADE DAS FUNCOES
 			for (int i = 0; i < Ninimigo; i++)
@@ -167,17 +179,32 @@ void ofApp::draw()
 				{
 					for (int j = 0; j < inimigo[i].vida; j++)
 					{
-						inimigo[i].EnemyLife.draw((inimigo[i].posicao.x + (j * inimigo[i].tamanhoXLife)) - camera.x, inimigo[i].posicao.y - camera.y);
+						inimigo[i].EnemyLife.draw(((inimigo[i].posicao.x + (j * 3)) - 60) - camera.x, (inimigo[i].posicao.y - 70) - camera.y);
 					}
-					inimigo[i].EnemyBar.draw(inimigo[i].posicao - camera);
+					inimigo[i].EnemyBar.draw((inimigo[i].posicao.x - 60) - camera.x, (inimigo[i].posicao.y - 70) - camera.y);
 				}
 			}
 
+			//power up desenhado na tela apos o inimigo morrer
+			for (int i = 0; i < Ninimigo; i++)
+			{
+				if (inimigo[i].powerUpRandon == i || inimigo[i].powerUpRandon2 == i)
+				{
+					inimigo[i].powerUpActive = true;
+					if (inimigo[i].powerUpActive == true && inimigo[i].vida <= 0)
+					{
+						
+						inimigo[i].vel.set(0,0);
+						PowerUp.posicao = inimigo[i].posicao;
+						desenhoPowerUp(PowerUp, camera);
+					}
+				}
+			}
 
 			desenhoNaTela(player, camera);
 			desenhoNaTelaTiro(ataque, camera);
 
-			//ALEATORIEDADE DE POSICOES NA TELA
+			//Desenhando inimigos
 			for (int i = 0; i < Ninimigo; i++)
 			{
 				if (inimigo[i].vida > 0)
