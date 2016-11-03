@@ -1,0 +1,13 @@
+Primeiro Power Up:
+
+-> Power up básico de dano a mais:
+Vai trocar a cor do tiro para sempre, com isso vai dar mais dano. 
+
+-> Como fazer? 
+Será escolhido entre um dos inimigos sorteados para cair o item. Depois que o inimigo morrer eles vai deixar o item e então o jogador
+precisa pega-lo.
+
+-> Como codificar isso?
+Fazer um numero random entre 1 e o maximo de inimigos vivos. Comparar com o numero de inimigo e se for igual ele vai receber uma bool de
+power up ativo. Então, assim que a bool for ativa e o inimigo estiver morto o item deverá aparecer na mesma posição que o inimigo estava. 
+Fazer a função de colisão com o jogador e assim que ele pegar mudar a imagem de tiro e soltar um aviso na tela que o dano aumentou. 
