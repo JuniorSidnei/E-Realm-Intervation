@@ -75,7 +75,7 @@ public:
 		ofImage EnemyLife;
 		float tamanhoX, tamanhoY, tamanhoXLife, tamanhoYLife;
 		float acele;
-		int vida = 300;
+		int vida = 600;
 		int powerUpRandon = (0 + (rand () % Ninimigo));
 		int powerUpRandon2 = (0 + (rand() % Ninimigo));
 		bool Tiro = false;
@@ -174,6 +174,7 @@ public:
 			T1.vida -= P2.dano;
 			T1.atingido = true;
 			T1.IniDir = true;
+			
 		}
 	}
 

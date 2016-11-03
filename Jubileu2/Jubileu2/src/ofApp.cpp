@@ -7,15 +7,16 @@ void ofApp::setup()
 		//vida da HUD
 		player.lifeBarPlayer.loadImage("players/BarraVida.png");
 		player.lifePlayer.loadImage("players/Vida.png");
-		player.lifeBarPlayer.resize(300, 80);
+		player.lifeBarPlayer.resize(305, 80);
 		player.lifePlayer.resize(2, 80);
 
+		//Carregando as imagens de HUD dos inimigos
 		for (int i = 0; i < Ninimigo; i++)
 		{
 			inimigo[i].EnemyBar.loadImage("players/LifeEnemyBar.png");
 			inimigo[i].EnemyLife.loadImage("players/LifeEnemy.png");
 			inimigo[i].EnemyBar.resize(100, inimigo[i].EnemyBar.getHeight());
-			inimigo[i].EnemyLife.resize(20, inimigo[i].EnemyLife.getHeight());
+			inimigo[i].EnemyLife.resize(14, inimigo[i].EnemyLife.getHeight());
 		}
 		
 
@@ -36,6 +37,7 @@ void ofApp::setup()
 		player.tamanhoYLife = player.lifePlayer.getHeight() / 2;
 		player.sprite.setAnchorPoint(player.sprite.getWidth() / 2, player.sprite.getHeight() / 2);
 		player.acele = 7.5f;
+		
 
 		//definicoes powerUp
 		PowerUp.sprite2.loadImage("players/PowerUpForca.png");
@@ -60,14 +62,13 @@ void ofApp::setup()
 			inimigo[i].acele = 0.8f;
 			inimigo[i].IniSub = true;
 			inimigo[i].vida = 30;
-
+			
+			
 		}
 
 
 
 		//definicoes do tiro
-		//ataque.posicao.x = 450;
-		//ataque.posicao.y = 500;
 		ataque.sprite.loadImage("players/armaPlayer.png");
 		ataque.sprite2.loadImage("players/armaPlayerUp1.png");
 		ataque.tamanhoX = ataque.sprite.getHeight() / 2;
@@ -135,6 +136,8 @@ void ofApp::update()
 					movimentoInimigo(inimigo[i]);
 				}
 			}
+
+			
 		}
 	}
 }
@@ -196,7 +199,9 @@ void ofApp::draw()
 						
 						inimigo[i].vel.set(0,0);
 						PowerUp.posicao = inimigo[i].posicao;
-						desenhoPowerUp(PowerUp, camera);
+						if (player.dano <= 1)
+						desenhoPowerUp(PowerUp, camera); 
+
 					}
 				}
 			}
@@ -219,15 +224,17 @@ void ofApp::draw()
 
 		}
 
-		if (player.vida <= 0)
+		else if (player.vida <= 0)
 			estadoJogo = GameOver;
 
-		if (player.pontos >= 10000)
-		{
-			ofBackground(0, 0, 0);
-			ofDrawBitmapString("VOCE VENCEU!", 400, 300);
-		}
-
+		
+		
+			/*if (player.quant > 10)
+			{
+				ofBackground(0, 0, 0);
+				ofDrawBitmapString("VOCE VENCEU!", 400, 300);
+			}*/
+		
 		break;
 
 	case GameOver:
