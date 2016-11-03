@@ -36,7 +36,7 @@ void ofApp::setup()
 		player.tamanhoXLife = player.lifePlayer.getWidth() / 2;
 		player.tamanhoYLife = player.lifePlayer.getHeight() / 2;
 		player.sprite.setAnchorPoint(player.sprite.getWidth() / 2, player.sprite.getHeight() / 2);
-		player.acele = 7.5f;
+		player.acele = 20.0f;
 		
 
 		//definicoes powerUp
@@ -59,11 +59,9 @@ void ofApp::setup()
 			inimigo[i].tamanhoYLife = inimigo[i].EnemyLife.getHeight();
 			inimigo[i].sprite.setAnchorPoint(inimigo[i].sprite.getWidth() / 2, inimigo[i].sprite.getHeight() / 2);
 			inimigo[i].sprite2.setAnchorPoint(inimigo[i].sprite2.getWidth() / 2, inimigo[i].sprite2.getHeight() / 2);
-			inimigo[i].acele = 0.8f;
+			inimigo[i].acele = 1.0f;
 			inimigo[i].IniSub = true;
 			inimigo[i].vida = 30;
-			
-			
 		}
 
 
@@ -133,7 +131,7 @@ void ofApp::update()
 						colisaoTiro(inimigo[i], ataque, player);
 					}
 					//Inimigo andando pela tela para cima e baixo
-					movimentoInimigo(inimigo[i]);
+					movimentoInimigo(inimigo[i], player);
 				}
 			}
 

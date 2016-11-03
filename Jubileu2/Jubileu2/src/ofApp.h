@@ -69,6 +69,7 @@ public:
 	{
 		ofVec2f posicao;
 		ofVec2f vel;
+		ofVec2f path;
 		ofImage sprite;
 		ofImage sprite2;
 		ofImage EnemyBar;
@@ -174,10 +175,16 @@ public:
 			T1.vida -= P2.dano;
 			T1.atingido = true;
 			T1.IniDir = true;
-			
 		}
 	}
-
+	//funcao que segue o inimigo
+	void monstroSeguir(personagem jogador, monstros&  monstro)
+	{
+		monstro.path = jogador.posicao - monstro.posicao;
+		monstro.path.normalize();
+		monstro.vel += monstro.acele + abs(monstro.vel.x) + abs(monstro.vel.y);
+		monstro.vel = monstro.path * monstro.vel.length();
+	}
 	void travaTela(personagem& P1)
 	{
 		//travando em y
@@ -233,10 +240,11 @@ public:
 		}
 	}
 
-	void movimentoInimigo(monstros &inimigo)
+	void movimentoInimigo(monstros &inimigo, personagem& player)
 	{
+		inimigo.vel.limit(100);
 		//movimento padrao para cima e para baixo
-		if (inimigo.atingido == false)
+		if (inimigo.atingido == false && inimigo.posicao.distance(player.posicao) > 400)
 		{
 			if (inimigo.IniSub == true)
 			{
@@ -261,11 +269,16 @@ public:
 				}
 			}
 		}
+		else if(inimigo.atingido == false)
+		{
+			monstroSeguir(player, inimigo);
+		}
 
 		//Se o inimigo levar um tiro ele muda a I.A
-		else
+		else 
 		{
-
+			inimigo.acele = 10.0f;
+			
 			if (inimigo.posicao.y < 400 || inimigo.posicao.y > 1100)
 			{
 				inimigo.atingido = false;
