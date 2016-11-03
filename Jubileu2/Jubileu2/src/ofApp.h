@@ -57,7 +57,7 @@ public:
 		float acele;
 		int vida = 300, pontos = 0, dano = 1;
 		bool Up = false; bool Down = false; bool Right = false; bool Left = false; bool Tiro = false;
-		bool acompanhando = false; bool tiroDirecao = false;
+		bool acompanhando = false; bool tiroDirecao = false; bool Ingame;
 		
 	};
 	personagem player;
@@ -84,6 +84,7 @@ public:
 		bool IniDesc = false;
 		bool IniDir = false; bool IniEsq = false; bool atingido = false;
 		bool powerUpActive = false;
+		bool iniVivo;
 	};
 
 
@@ -117,9 +118,9 @@ public:
 	{
 		objeto.sprite2.draw(objeto.posicao - mundo);
 	}
-	void desenhoNaTelaTiro(golpes& objeto, ofVec2f& mundo)
+	void desenhoNaTelaTiro(golpes& objeto, ofVec2f& mundo, monstros& monstro)
 	{
-		if (objeto.powerUpAtkActive == false)
+		if (monstro.powerUpActive == false)
 			objeto.sprite.draw(objeto.posicao - mundo);
 		else
 			objeto.sprite2.draw(objeto.posicao - mundo);
@@ -150,7 +151,7 @@ public:
 	}
 
 	//colisao com powerUp
-	void colisaoPowerUp(personagem& P1, personagem& P2, golpes& tiro)
+	void colisaoPowerUp(personagem& P1, personagem& P2, monstros& mosntro)
 	{
 
 		//Colisao certa
@@ -158,8 +159,10 @@ public:
 			P1.posicao.y + P1.tamanhoY > P2.posicao.y - P2.tamanhoY &&
 			P1.posicao.y - P1.tamanhoY < P2.posicao.y + P2.tamanhoY)
 		{
-			tiro.powerUpAtkActive = true;
+			//tiro.powerUpAtkActive = false;
+			P2.Ingame = false;
 			P1.dano = 2;
+			mosntro.powerUpActive = true;
 		}
 	}
 	void colisaoTiro(monstros& T1, golpes& P1, personagem& P2)
@@ -177,13 +180,25 @@ public:
 			T1.IniDir = true;
 		}
 	}
-	//funcao que segue o inimigo
+	//funcao que o inimigo segue o player 
 	void monstroSeguir(personagem jogador, monstros&  monstro)
 	{
 		monstro.path = jogador.posicao - monstro.posicao;
 		monstro.path.normalize();
 		monstro.vel += monstro.acele + abs(monstro.vel.x) + abs(monstro.vel.y);
 		monstro.vel = monstro.path * monstro.vel.length();
+	}
+
+	void sorteioDrop(monstros& inimigo)
+	{
+		int sorteio = rand() % 100;
+
+		if (sorteio < 50)
+		{
+			inimigo.powerUpActive = true;
+			PowerUp.posicao = inimigo.posicao;
+			PowerUp.Ingame = true;
+		}
 	}
 	void travaTela(personagem& P1)
 	{

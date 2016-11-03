@@ -62,6 +62,7 @@ void ofApp::setup()
 			inimigo[i].acele = 1.0f;
 			inimigo[i].IniSub = true;
 			inimigo[i].vida = 30;
+			inimigo[i].iniVivo = true;
 		}
 
 
@@ -118,7 +119,10 @@ void ofApp::update()
 			movimento(player, ataque);
 
 			//colisao com o power up
-			colisaoPowerUp(player, PowerUp, ataque);
+			for (int i = 0; i < Ninimigo; i++)
+			{
+				colisaoPowerUp(player, PowerUp, inimigo[i]);
+			}
 
 			//ALEATORIEDADE DAS FUNCOES
 			for (int i = 0; i < Ninimigo; i++)
@@ -129,6 +133,8 @@ void ofApp::update()
 					if (ataque.Tiro == true)
 					{
 						colisaoTiro(inimigo[i], ataque, player);
+						if (inimigo[i].vida <= 0)
+							sorteioDrop(inimigo[i]);
 					}
 					//Inimigo andando pela tela para cima e baixo
 					movimentoInimigo(inimigo[i], player);
@@ -153,7 +159,7 @@ void ofApp::draw()
 
 		FundoMenu.draw(0, 0);
 		ofDrawBitmapString("APERTE 'Z' PARA JOGAR!", 300, 400);
-		//ta com um bug bizarro tem qque ver
+		
 		break;
 
 	case GamePlay:
@@ -187,25 +193,19 @@ void ofApp::draw()
 			}
 
 			//power up desenhado na tela apos o inimigo morrer
-			for (int i = 0; i < Ninimigo; i++)
-			{
-				if (inimigo[i].powerUpRandon == i || inimigo[i].powerUpRandon2 == i)
-				{
-					inimigo[i].powerUpActive = true;
-					if (inimigo[i].powerUpActive == true && inimigo[i].vida <= 0)
-					{
-						
-						inimigo[i].vel.set(0,0);
-						PowerUp.posicao = inimigo[i].posicao;
-						if (player.dano <= 1)
-						desenhoPowerUp(PowerUp, camera); 
+			if (PowerUp.Ingame == true)
+				desenhoPowerUp(PowerUp, camera); 
 
-					}
-				}
-			}
+					
+				
+			
 
 			desenhoNaTela(player, camera);
-			desenhoNaTelaTiro(ataque, camera);
+
+			for (int i = 0; i < Ninimigo; i++)
+			{
+				desenhoNaTelaTiro(ataque, camera, inimigo[i]);
+			}
 
 			//Desenhando inimigos
 			for (int i = 0; i < Ninimigo; i++)
