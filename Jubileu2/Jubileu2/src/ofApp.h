@@ -41,7 +41,7 @@ public:
 	
 	ofImage FundoMenu;
 
-	int estadoJogo = GamePlay;
+	int estadoJogo = Menu;
 
 	//personagem completo
 	struct personagem

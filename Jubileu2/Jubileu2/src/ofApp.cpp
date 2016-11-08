@@ -49,7 +49,7 @@ void ofApp::setup()
 		for (int i = 0; i < Ninimigo; i++)
 		{
 			
-			inimigo[i].posicao.x = 700 + (rand() % 4072);
+			inimigo[i].posicao.x = 900 + (rand() % 4072);
 			inimigo[i].posicao.y = 100 + (rand() % 450);
 			inimigo[i].sprite.loadImage("players/AlienVerde.png");
 			inimigo[i].sprite2.loadImage("players/AlienAmarelo.png");
@@ -158,7 +158,6 @@ void ofApp::draw()
 	case Menu:
 
 		FundoMenu.draw(0, 0);
-		ofDrawBitmapString("APERTE 'Z' PARA JOGAR!", 300, 400);
 		
 		break;
 
@@ -252,7 +251,7 @@ void ofApp::keyPressed(int key)
 	switch (estadoJogo)
 	{
 	case Menu:
-		if (key == 'Z' || key == 'z')
+		if (key == '1')
 			estadoJogo = GamePlay;
 		break;
 
