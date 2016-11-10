@@ -3,10 +3,19 @@
 void ofApp::setup()
 {
 	//Imagem de fundo
-	fundo.posicao.x = 0;
-	fundo.posicao.y = 0;
-	fundo.sprite.loadImage("Cenario/Rua2.png");
+	for (int i = 0; i < 2; i++)
+	{
+		fundo[0].posicao.x = 0;
+		fundo[0].posicao.y = 0;
+		fundo[0].street.loadImage("Cenario/Rua2.png");
+		fundo[1].posicao.x = 4400;
+		fundo[1].posicao.y = 0;
+		fundo[1].boss.loadImage("Cenario/Rua3.png");
+		
+	}
 	FundoMenu.loadImage("Menu/FundoMenu.png");
+
+	
 
 
 	//definicoes padrao do player
@@ -172,8 +181,16 @@ void ofApp::draw()
 
 
 			//fundo do jogo
-			desenhoNaTela(fundo, camera);
+			for (int i = 0; i < 2; i++)
+			{
+				desenhoNaTelaFundo(fundo[0], camera);
 
+				if (player.posicao.x >= 3900)
+				{
+					fundo[1].bosslimit = true;
+					desenhoNaTelaFundo(fundo[1], camera);
+				}
+			}
 			//HUD
 			for (int i = 0; i < player.vida; i++)
 			{

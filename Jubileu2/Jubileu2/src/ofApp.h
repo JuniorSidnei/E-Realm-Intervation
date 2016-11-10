@@ -60,7 +60,15 @@ public:
 
 	};
 	personagem player;
-	personagem fundo;
+
+	struct maps
+	{
+		ofVec2f posicao;
+		ofImage street;
+		ofImage boss;
+		bool bosslimit = false;
+	};
+	maps fundo[2];
 
 	struct powerUp
 	{
@@ -116,11 +124,15 @@ public:
 	golpes ataque;
 
 
-
-
 	void desenhoNaTela(personagem& objeto, ofVec2f& mundo)
 	{
 		objeto.sprite.draw(objeto.posicao - mundo);
+	}
+	void desenhoNaTelaFundo(maps& objeto, ofVec2f& mundo)
+	{
+		objeto.street.draw(objeto.posicao - mundo);
+		if(objeto.bosslimit == true)
+		objeto.boss.draw(objeto.posicao - mundo);
 	}
 	void desenhoPowerUpDamage(powerUp& objeto, ofVec2f mundo)
 	{
@@ -266,7 +278,7 @@ public:
 			P1.posicao.y -= 4;
 			P1.vel.set(0, 0);
 		}
-		else if (P1.posicao.y < 500)
+		else if (P1.posicao.y < 400)
 		{
 			P1.posicao.y += 4;
 			P1.vel.set(0, 0);
@@ -275,11 +287,6 @@ public:
 		if (P1.posicao.x < 500)
 		{
 			P1.posicao.x += 4;
-			P1.vel.set(0, 0);
-		}
-		if (P1.posicao.x > 4300)
-		{
-			P1.posicao -= 4;
 			P1.vel.set(0, 0);
 		}
 	}
