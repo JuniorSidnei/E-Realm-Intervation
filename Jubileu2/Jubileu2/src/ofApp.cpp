@@ -8,7 +8,7 @@ void ofApp::setup()
 		fundo[0].posicao.x = 0;
 		fundo[0].posicao.y = 0;
 		fundo[0].street.loadImage("Cenario/Rua2.png");
-		fundo[1].posicao.x = 4400;
+		fundo[1].posicao.x = 4700;
 		fundo[1].posicao.y = 0;
 		fundo[1].boss.loadImage("Cenario/Rua3.png");
 		
