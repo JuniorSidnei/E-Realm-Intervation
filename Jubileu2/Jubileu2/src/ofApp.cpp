@@ -2,82 +2,90 @@
 
 void ofApp::setup()
 {
-	
-
-		//vida da HUD
-		player.lifeBarPlayer.loadImage("players/BarraVida.png");
-		player.lifePlayer.loadImage("players/Vida.png");
-		player.lifeBarPlayer.resize(305, 80);
-		player.lifePlayer.resize(2, 80);
-
-		//Carregando as imagens de HUD dos inimigos
-		for (int i = 0; i < Ninimigo; i++)
-		{
-			inimigo[i].EnemyBar.loadImage("players/LifeEnemyBar.png");
-			inimigo[i].EnemyLife.loadImage("players/LifeEnemy.png");
-			inimigo[i].EnemyBar.resize(100, inimigo[i].EnemyBar.getHeight());
-			inimigo[i].EnemyLife.resize(14, inimigo[i].EnemyLife.getHeight());
-		}
-		
-
-		//Imagem de fundo
-		fundo.posicao.x = 0;
-		fundo.posicao.y = 0;
-		fundo.sprite.loadImage("Cenario/Rua2.png");
-		FundoMenu.loadImage("Menu/FundoMenu.png");
 
 
-		//definicoes padrao do player
-		player.posicao.x = 600;
-		player.posicao.y = 400;
-		player.sprite.loadImage("players/Player.png");
-		player.tamanhoY = player.sprite.getHeight() / 2;
-		player.tamanhoX = player.sprite.getWidth() / 2;
-		player.tamanhoXLife = player.lifePlayer.getWidth() / 2;
-		player.tamanhoYLife = player.lifePlayer.getHeight() / 2;
-		player.sprite.setAnchorPoint(player.sprite.getWidth() / 2, player.sprite.getHeight() / 2);
-		player.acele = 20.0f;
-		
+	//vida da HUD
+	player.lifeBarPlayer.loadImage("players/BarraVida.png");
+	player.lifePlayer.loadImage("players/Vida.png");
+	player.lifeBarPlayer.resize(305, 80);
+	player.lifePlayer.resize(2, 80);
 
-		//definicoes powerUp
-		PowerUp.sprite2.loadImage("players/PowerUpForca.png");
-		PowerUp.sprite2.setAnchorPoint(PowerUp.sprite2.getWidth() / 2, PowerUp.sprite2.getHeight() / 2);
-		PowerUp.tamanhoY = PowerUp.sprite2.getHeight() / 2;
-		PowerUp.tamanhoX = PowerUp.sprite2.getWidth() / 2;
-
-		//definicoes padrao dos inimigos por vetores
-		for (int i = 0; i < Ninimigo; i++)
-		{
-			
-			inimigo[i].posicao.x = 900 + (rand() % 4072);
-			inimigo[i].posicao.y = 100 + (rand() % 450);
-			inimigo[i].sprite.loadImage("players/AlienVerde.png");
-			inimigo[i].sprite2.loadImage("players/AlienAmarelo.png");
-			inimigo[i].tamanhoY = inimigo[i].sprite.getHeight() / 2;
-			inimigo[i].tamanhoX = inimigo[i].sprite.getWidth() / 2;
-			inimigo[i].tamanhoXLife = inimigo[i].EnemyLife.getWidth();
-			inimigo[i].tamanhoYLife = inimigo[i].EnemyLife.getHeight();
-			inimigo[i].sprite.setAnchorPoint(inimigo[i].sprite.getWidth() / 2, inimigo[i].sprite.getHeight() / 2);
-			inimigo[i].sprite2.setAnchorPoint(inimigo[i].sprite2.getWidth() / 2, inimigo[i].sprite2.getHeight() / 2);
-			inimigo[i].acele = 1.0f;
-			inimigo[i].IniSub = true;
-			inimigo[i].vida = 30;
-			inimigo[i].iniVivo = true;
-		}
+	//Carregando as imagens de HUD dos inimigos
+	for (int i = 0; i < Ninimigo; i++)
+	{
+		inimigo[i].EnemyBar.loadImage("players/LifeEnemyBar.png");
+		inimigo[i].EnemyLife.loadImage("players/LifeEnemy.png");
+		inimigo[i].EnemyBar.resize(100, inimigo[i].EnemyBar.getHeight());
+		inimigo[i].EnemyLife.resize(14, inimigo[i].EnemyLife.getHeight());
+	}
 
 
+	//Imagem de fundo
+	fundo.posicao.x = 0;
+	fundo.posicao.y = 0;
+	fundo.sprite.loadImage("Cenario/Rua2.png");
+	FundoMenu.loadImage("Menu/FundoMenu.png");
 
-		//definicoes do tiro
-		ataque.sprite.loadImage("players/armaPlayer.png");
-		ataque.sprite2.loadImage("players/armaPlayerUp1.png");
-		ataque.tamanhoX = ataque.sprite.getHeight() / 2;
-		ataque.tamanhoX = ataque.sprite.getWidth() / 2;
-		ataque.sprite.setAnchorPoint(ataque.sprite.getWidth() / 2, ataque.sprite.getHeight() / 2);
-		ataque.sprite2.setAnchorPoint(ataque.sprite2.getWidth() / 2, ataque.sprite2.getHeight() / 2);
-		ataque.acele = 950.0f;
-		ataque.acompanhando = true;
 
-		
+	//definicoes padrao do player
+	player.posicao.x = 600;
+	player.posicao.y = 400;
+	player.sprite.loadImage("players/Player.png");
+	player.tamanhoY = player.sprite.getHeight() / 2;
+	player.tamanhoX = player.sprite.getWidth() / 2;
+	player.tamanhoXLife = player.lifePlayer.getWidth() / 2;
+	player.tamanhoYLife = player.lifePlayer.getHeight() / 2;
+	player.sprite.setAnchorPoint(player.sprite.getWidth() / 2, player.sprite.getHeight() / 2);
+	player.acele = 20.0f;
+	player.vida = 300;
+
+	//definicoes powerUp de dano
+	damageUp.damage.loadImage("players/PowerUpForca.png");
+	damageUp.damage.setAnchorPoint(damageUp.damage.getWidth() / 2, damageUp.damage.getHeight() / 2);
+	damageUp.tamanhoY = damageUp.damage.getHeight() / 2;
+	damageUp.tamanhoX = damageUp.damage.getWidth() / 2;
+
+	//definicoes da cura
+	potion.heal.loadImage("players/PocaoVida.png");
+	potion.heal.setAnchorPoint(potion.heal.getWidth() / 2, potion.heal.getHeight() / 2);
+	potion.tamanhoY = potion.heal.getHeight() / 2;
+	potion.tamanhoX = potion.heal.getWidth() / 2;
+
+	//definicoes padrao dos inimigos por vetores
+	for (int i = 0; i < Ninimigo; i++)
+	{
+
+		inimigo[i].posicao.x = 900 + (rand() % 4072);
+		inimigo[i].posicao.y = 100 + (rand() % 450);
+		inimigo[i].sprite.loadImage("players/AlienVerde.png");
+		inimigo[i].sprite2.loadImage("players/AlienAmarelo.png");
+		inimigo[i].sprite3.loadImage("players/AlienVermelho.png");
+		inimigo[i].tamanhoY = inimigo[i].sprite.getHeight() / 2;
+		inimigo[i].tamanhoX = inimigo[i].sprite.getWidth() / 2;
+		inimigo[i].tamanhoXLife = inimigo[i].EnemyLife.getWidth();
+		inimigo[i].tamanhoYLife = inimigo[i].EnemyLife.getHeight();
+		inimigo[i].sprite.setAnchorPoint(inimigo[i].sprite.getWidth() / 2, inimigo[i].sprite.getHeight() / 2);
+		inimigo[i].sprite2.setAnchorPoint(inimigo[i].sprite2.getWidth() / 2, inimigo[i].sprite2.getHeight() / 2);
+		inimigo[i].sprite3.setAnchorPoint(inimigo[i].sprite3.getWidth() / 2, inimigo[i].sprite3.getHeight() / 2);
+		inimigo[i].acele = 1.0f;
+		inimigo[i].IniSub = true;
+		inimigo[i].vida = 30;
+
+	}
+
+
+
+	//definicoes do tiro
+	ataque.sprite.loadImage("players/armaPlayer.png");
+	ataque.sprite2.loadImage("players/armaPlayerUp1.png");
+	ataque.tamanhoX = ataque.sprite.getHeight() / 2;
+	ataque.tamanhoX = ataque.sprite.getWidth() / 2;
+	ataque.sprite.setAnchorPoint(ataque.sprite.getWidth() / 2, ataque.sprite.getHeight() / 2);
+	ataque.sprite2.setAnchorPoint(ataque.sprite2.getWidth() / 2, ataque.sprite2.getHeight() / 2);
+	ataque.acele = 950.0f;
+	ataque.acompanhando = true;
+
+
 }
 
 //--------------------------------------------------------------
@@ -98,7 +106,7 @@ void ofApp::update()
 
 			//setando as posicoes x e y mais a velocidade multiplicada pelo tempo
 			player.posicao += player.vel * time;
-			
+
 			//camera do player
 			camera = player.posicao - ofVec2f(ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
 
@@ -121,7 +129,8 @@ void ofApp::update()
 			//colisao com o power up
 			for (int i = 0; i < Ninimigo; i++)
 			{
-				colisaoPowerUp(player, PowerUp, inimigo[i]);
+				colisaoPowerUp(player, damageUp, inimigo[i]);
+				colisaoPowerUp(player, potion, inimigo[i]);
 			}
 
 			//ALEATORIEDADE DAS FUNCOES
@@ -138,10 +147,17 @@ void ofApp::update()
 					}
 					//Inimigo andando pela tela para cima e baixo
 					movimentoInimigo(inimigo[i], player);
+
+					if (inimigo[i].vida <= 10)
+					{
+						inimigo[i].dano = 4;
+						inimigo[i].acele = 200.0f;
+						monstroSeguir(player, inimigo[i]);
+					}
 				}
 			}
 
-			
+
 		}
 	}
 }
@@ -158,7 +174,7 @@ void ofApp::draw()
 	case Menu:
 
 		FundoMenu.draw(0, 0);
-		
+
 		break;
 
 	case GamePlay:
@@ -173,7 +189,10 @@ void ofApp::draw()
 			//HUD
 			for (int i = 0; i < player.vida; i++)
 			{
+
 				player.lifePlayer.draw(10 + (i * player.tamanhoXLife), 80);
+				if (player.vida >= 300)
+					player.vida = 300;
 			}
 
 			player.lifeBarPlayer.draw(10, 80);
@@ -192,12 +211,10 @@ void ofApp::draw()
 			}
 
 			//power up desenhado na tela apos o inimigo morrer
-			if (PowerUp.Ingame == true)
-				desenhoPowerUp(PowerUp, camera); 
-
-					
-				
-			
+			if (damageUp.Ingame == true)
+				desenhoPowerUpDamage(damageUp, camera);
+			else if (potion.Ingame == true)
+				desenhoPowerUpPotion(potion, camera);
 
 			desenhoNaTela(player, camera);
 
@@ -224,14 +241,14 @@ void ofApp::draw()
 		else if (player.vida <= 0)
 			estadoJogo = GameOver;
 
-		
-		
-			/*if (player.quant > 10)
-			{
-				ofBackground(0, 0, 0);
-				ofDrawBitmapString("VOCE VENCEU!", 400, 300);
-			}*/
-		
+
+
+		/*if (player.quant > 10)
+		{
+		ofBackground(0, 0, 0);
+		ofDrawBitmapString("VOCE VENCEU!", 400, 300);
+		}*/
+
 		break;
 
 	case GameOver:
