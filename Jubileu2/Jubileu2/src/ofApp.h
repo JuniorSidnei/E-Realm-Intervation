@@ -2,7 +2,7 @@
 
 
 #include "ofMain.h"
-#define Ninimigo 10
+#define Ninimigo 15
 #define Menu 1
 #define GamePlay 2
 #define GameOver 3
@@ -37,11 +37,9 @@ public:
 	ofVec2f camera;
 
 	//Imagens da HUD
-
-
 	ofImage FundoMenu;
 
-	int estadoJogo = Menu;
+	int estadoJogo = GamePlay;
 
 	//personagem completo
 	struct personagem
@@ -265,22 +263,24 @@ public:
 		//travando em y
 		if (P1.posicao.y > 1100)
 		{
-
-			P1.acele = 0.1f;
-			//P1.posicao.y -= 4;
+			P1.posicao.y -= 4;
+			P1.vel.set(0, 0);
 		}
-		else if (P1.posicao.y < 400)
+		else if (P1.posicao.y < 500)
 		{
-
-			P1.vel.limit(0);
-			//P1.posicao.y += 4;
+			P1.posicao.y += 4;
+			P1.vel.set(0, 0);
 		}
 		//travando o player na tela em x
-		if (P1.posicao.x < 300)
+		if (P1.posicao.x < 500)
 		{
-
-			P1.vel.limit(0);
-			//P1.posicao.x += 4;
+			P1.posicao.x += 4;
+			P1.vel.set(0, 0);
+		}
+		if (P1.posicao.x > 4300)
+		{
+			P1.posicao -= 4;
+			P1.vel.set(0, 0);
 		}
 	}
 

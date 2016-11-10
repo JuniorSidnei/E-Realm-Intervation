@@ -2,24 +2,6 @@
 
 void ofApp::setup()
 {
-
-
-	//vida da HUD
-	player.lifeBarPlayer.loadImage("players/BarraVida.png");
-	player.lifePlayer.loadImage("players/Vida.png");
-	player.lifeBarPlayer.resize(305, 80);
-	player.lifePlayer.resize(2, 80);
-
-	//Carregando as imagens de HUD dos inimigos
-	for (int i = 0; i < Ninimigo; i++)
-	{
-		inimigo[i].EnemyBar.loadImage("players/LifeEnemyBar.png");
-		inimigo[i].EnemyLife.loadImage("players/LifeEnemy.png");
-		inimigo[i].EnemyBar.resize(100, inimigo[i].EnemyBar.getHeight());
-		inimigo[i].EnemyLife.resize(14, inimigo[i].EnemyLife.getHeight());
-	}
-
-
 	//Imagem de fundo
 	fundo.posicao.x = 0;
 	fundo.posicao.y = 0;
@@ -28,8 +10,12 @@ void ofApp::setup()
 
 
 	//definicoes padrao do player
+	player.lifeBarPlayer.loadImage("players/BarraVida.png");
+	player.lifePlayer.loadImage("players/Vida.png");
+	player.lifeBarPlayer.resize(305, 80);
+	player.lifePlayer.resize(2, 80);
 	player.posicao.x = 600;
-	player.posicao.y = 400;
+	player.posicao.y = 700;
 	player.sprite.loadImage("players/Player.png");
 	player.tamanhoY = player.sprite.getHeight() / 2;
 	player.tamanhoX = player.sprite.getWidth() / 2;
@@ -71,7 +57,10 @@ void ofApp::setup()
 		inimigo[i].acele = 1.0f;
 		inimigo[i].IniSub = true;
 		inimigo[i].vida = 30;
-
+		inimigo[i].EnemyBar.loadImage("players/LifeEnemyBar.png");
+		inimigo[i].EnemyLife.loadImage("players/LifeEnemy.png");
+		inimigo[i].EnemyBar.resize(100, inimigo[i].EnemyBar.getHeight());
+		inimigo[i].EnemyLife.resize(14, inimigo[i].EnemyLife.getHeight());
 	}
 
 
@@ -92,24 +81,18 @@ void ofApp::setup()
 //--------------------------------------------------------------
 void ofApp::update()
 {
+	//pegando tempo para usar na movimentação
+	double time = ofGetLastFrameTime();
+
 	switch (estadoJogo)
 	{
-	case Menu:
-
-		break;
-
 	case GamePlay:
 
 		if (player.vida > 0)
 		{
-			//pegando tempo para usar na movimentação
-			double time = ofGetLastFrameTime();
-
+			
 			//setando as posicoes x e y mais a velocidade multiplicada pelo tempo
 			player.posicao += (player.dash + player.vel) * time;
-
-			//dash 
-			//dashVect(player);
 
 			//camera do player
 			camera = player.posicao - ofVec2f(ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
@@ -163,6 +146,7 @@ void ofApp::update()
 
 			updateVector(player.dash, time);
 		}
+		break;
 	}
 }
 
@@ -256,10 +240,10 @@ void ofApp::draw()
 		break;
 
 	case GameOver:
-	{
+	
 		ofBackground(0, 0, 0);
 		ofDrawBitmapString("VOCE MORREU!", 400, 300);
-	}
+	
 	break;
 
 	}
@@ -320,6 +304,8 @@ void ofApp::keyPressed(int key)
 
 		break;
 	case GameOver:
+		if (key == 2)
+			estadoJogo = Menu;
 		break;
 	}
 }
