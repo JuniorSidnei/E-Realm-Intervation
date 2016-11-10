@@ -51,7 +51,7 @@ void ofApp::setup()
 	for (int i = 0; i < Ninimigo; i++)
 	{
 
-		inimigo[i].posicao.x = 900 + (rand() % 4072);
+		inimigo[i].posicao.x = 900 + (rand() % 5096);
 		inimigo[i].posicao.y = 100 + (rand() % 450);
 		inimigo[i].sprite.loadImage("players/AlienVerde.png");
 		inimigo[i].sprite2.loadImage("players/AlienAmarelo.png");
@@ -191,6 +191,7 @@ void ofApp::draw()
 					desenhoNaTelaFundo(fundo[1], camera);
 				}
 			}
+
 			//HUD
 			for (int i = 0; i < player.vida; i++)
 			{
