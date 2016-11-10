@@ -50,6 +50,7 @@ void ofApp::setup()
 	potion.heal.setAnchorPoint(potion.heal.getWidth() / 2, potion.heal.getHeight() / 2);
 	potion.tamanhoY = potion.heal.getHeight() / 2;
 	potion.tamanhoX = potion.heal.getWidth() / 2;
+	potion.vida = rand() % 3;
 
 	//definicoes padrao dos inimigos por vetores
 	for (int i = 0; i < Ninimigo; i++)
@@ -105,7 +106,10 @@ void ofApp::update()
 			double time = ofGetLastFrameTime();
 
 			//setando as posicoes x e y mais a velocidade multiplicada pelo tempo
-			player.posicao += player.vel * time;
+			player.posicao += (player.dash + player.vel) * time;
+
+			//dash 
+			//dashVect(player);
 
 			//camera do player
 			camera = player.posicao - ofVec2f(ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
@@ -157,7 +161,7 @@ void ofApp::update()
 				}
 			}
 
-
+			updateVector(player.dash, time);
 		}
 	}
 }
@@ -235,7 +239,7 @@ void ofApp::draw()
 			//Debugs para testes
 			ofDrawBitmapString("Posicao do player: " + ofToString(player.posicao), 10, 10);
 			ofDrawBitmapString("PONTOS: " + ofToString(player.pontos), 10, 50);
-
+			ofDrawBitmapString("VIDA: " + ofToString(player.vida), 10, 70);
 		}
 
 		else if (player.vida <= 0)
@@ -274,22 +278,23 @@ void ofApp::keyPressed(int key)
 
 	case GamePlay:
 		//se a tecla estiver sendo pressionada, movimenta
-		if (key == OF_KEY_UP || key == 'w')
+		if (key == OF_KEY_UP)
 		{
 			player.Up = true;
 		}
-		if (key == OF_KEY_DOWN || key == 's')
+		if (key == OF_KEY_DOWN)
 		{
 			player.Down = true;
+		
 		}
-		if (key == OF_KEY_RIGHT || key == 'd')
+		if (key == OF_KEY_RIGHT)
 		{
 			player.Right = true;
 			if (ataque.Tiro == false) {
 				ataque.acele = 950.0f;
 			}
 		}
-		if (key == OF_KEY_LEFT || key == 'a')
+		if (key == OF_KEY_LEFT)
 		{
 			player.Left = true;
 			if (ataque.Tiro == false) {
@@ -301,8 +306,18 @@ void ofApp::keyPressed(int key)
 		{
 			ataque.acompanhando = false;
 			ataque.Tiro = true;
-
 		}
+		//Dashs em x e y 
+		if (key == 'c')
+			player.dash.set(600, 0);
+		if (key == 'z')
+			player.dash.set(-600, 0);
+		if (key == 'a')
+			player.dash.set(0, 600);
+		if (key == 'd')
+			player.dash.set(0, -600);
+
+
 		break;
 	case GameOver:
 		break;
@@ -344,6 +359,7 @@ void ofApp::keyReleased(int key)
 			ataque.acompanhando = true;
 			ataque.Tiro = false;
 		}
+		
 		break;
 
 	case GameOver:

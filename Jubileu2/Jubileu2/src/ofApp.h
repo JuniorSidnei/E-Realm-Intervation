@@ -49,6 +49,7 @@ public:
 	{
 		ofVec2f posicao;
 		ofVec2f vel;
+		ofVec2f dash;
 		ofImage sprite;
 		ofImage sprite2;
 		ofImage lifeBarPlayer;
@@ -57,7 +58,7 @@ public:
 		float acele;
 		int vida, pontos = 0, dano = 1;
 		bool Up = false; bool Down = false; bool Right = false; bool Left = false; bool Tiro = false;
-		bool acompanhando = false; bool tiroDirecao = false; bool colison = false;
+		bool acompanhando = false; bool tiroDirecao = false; bool colison = false; bool dashY; bool dashX;
 
 	};
 	personagem player;
@@ -67,7 +68,7 @@ public:
 	{
 		bool Ingame; bool moredamage = false; bool cure = false;
 		int dano = 3;
-		int vida = rand() % 3;
+		int vida;
 		float tamanhoX, tamanhoY;
 		ofVec2f posicao;
 		ofImage damage;
@@ -149,6 +150,36 @@ public:
 			inimigo.sprite3.draw(inimigo.posicao - mundo);
 	}
 
+	//parando o dash para não ser infinito
+	void updateVector(ofVec2f& vec, float time) 
+	{
+		if (vec.x > 0) 
+		{
+
+			vec.x += (-player.acele * 40) * time;
+			if (vec.x < 0)
+				vec.x = 0;
+		}
+		else if (vec.x < 0) {
+
+			vec.x += (player.acele * 40) * time;
+			if (vec.x > 0)
+				vec.x = 0;
+		}
+
+		if (vec.y > 0) {
+
+			vec.y += (-player.acele * 40) * time;
+			if (vec.y < 0)
+				vec.y = 0;
+		}
+		else if (vec.y < 0) {
+
+			vec.y += (player.acele * 40) * time;
+			if (vec.y > 0)
+				vec.y = 0;
+		}
+	}
 
 	//FUNCAO DE COLISAO QUE PASSA O PLAYER E O QUE COLIDE
 	void colisao(personagem& P1, monstros& P2)
@@ -283,7 +314,7 @@ public:
 		//Tiro sempre segue o player e se colidir com inimigo volta
 		if (T1.acompanhando == true || P1.colison == true)
 		{
-			T1.posicao = P1.posicao;
+			T1.posicao =  P1.posicao;
 			P1.colison = false;
 		}
 		//tiro movimenta se pressionado x
