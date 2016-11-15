@@ -2,7 +2,7 @@
 
 
 #include "ofMain.h"
-#define Ninimigo 5
+#define Ninimigo 6
 #define Menu 1
 #define GamePlay 2
 #define GameOver 3
