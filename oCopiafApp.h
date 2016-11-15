@@ -2,13 +2,13 @@
 
 
 #include "ofMain.h"
-#define Ninimigo 10
+#define Ninimigo 5
 #define Menu 1
 #define GamePlay 2
 #define GameOver 3
 
 
-	class ofApp : public ofBaseApp
+class ofApp : public ofBaseApp
 {
 
 
@@ -37,11 +37,9 @@ public:
 	ofVec2f camera;
 
 	//Imagens da HUD
-
-
 	ofImage FundoMenu;
 
-	int estadoJogo = Menu;
+	int estadoJogo = GamePlay;
 
 	//personagem completo
 	struct personagem
@@ -49,25 +47,38 @@ public:
 	{
 		ofVec2f posicao;
 		ofVec2f vel;
+		ofVec2f dash;
 		ofImage sprite;
 		ofImage sprite2;
 		ofImage lifeBarPlayer;
+		ofImage lifeBarPlayer2;
+		ofImage lifeBarPlayer3;
 		ofImage lifePlayer;
-		float tamanhoX, tamanhoY, tamanhoXLife, tamanhoYLife;
-		float acele;
-		int vida, pontos = 0, dano = 1;
+		ofSoundPlayer walking;
+		ofSoundPlayer shooting;
+		float tamanhoX, tamanhoY, tamanhoXLife, tamanhoYLife, temAnimacao;
+		float acele, tempSom, animacao, frame;
+		int vida, pontos = 0, dano = 1, continues;
 		bool Up = false; bool Down = false; bool Right = false; bool Left = false; bool Tiro = false;
-		bool acompanhando = false; bool tiroDirecao = false; bool colison = false;
+		bool acompanhando = false; bool tiroDirecao = false; bool colison = false; bool dashY; bool dashX;
 
 	};
 	personagem player;
-	personagem fundo;
-	
+
+	struct maps
+	{
+		ofVec2f posicao;
+		ofImage street;
+		ofImage boss;
+		bool bosslimit = false;
+	};
+	maps fundo;
+
 	struct powerUp
 	{
-		bool Ingame; bool moredamage = false; bool cure = false;
-		int dano = 3;
-		int vida = rand() % 3;
+		bool Ingame; bool moredamage = false; bool cure = false; bool colidir = false;
+		int dano;
+		int vida;
 		float tamanhoX, tamanhoY;
 		ofVec2f posicao;
 		ofImage damage;
@@ -85,47 +96,56 @@ public:
 		ofImage sprite;
 		ofImage sprite2;
 		ofImage sprite3;
+		ofImage spriteBoss;
+		ofImage Bossbar;
+		ofImage BossLife;
 		ofImage EnemyBar;
 		ofImage EnemyLife;
+		ofSoundPlayer scream;
 		float tamanhoX, tamanhoY, tamanhoXLife, tamanhoYLife;
-		float acele;
-		int vida, dano = 2;
+		float acele, animaTime, waveTime, somTime, Tptime, frame, animacao, tempAnimacao;
+		int vida, dano = 2, waitTime;
 		bool IniSub = false;
 		bool IniDesc = false;
 		bool IniDir = false; bool IniEsq = false; bool atingido = false;
-		bool powerUpActive = false;
+		bool powerUpActive = false; bool waveOn = false;
 	};
 
 
 	monstros inimigo[Ninimigo];
-
+	monstros Boss;
 
 	//
 	struct golpes
 	{
 		ofVec2f posicao;
 		ofVec2f vel;
+		ofVec2f path;
 		ofImage sprite;
 		ofImage sprite2;
 		float tamanhoX, tamanhoY;
-		float acele;
+		float acele, angulo;
 		bool Tiro = false;
 		bool acompanhando = false; bool Dir = false;
 		bool powerUpAtkActive = false;
 	};
 	//preciso mudar esse nome de variavel
 	golpes ataque;
-
-
-
+	golpes ataqueBoss[4];
 
 	void desenhoNaTela(personagem& objeto, ofVec2f& mundo)
 	{
-		objeto.sprite.draw(objeto.posicao - mundo);
+		objeto.sprite.drawSubsection(objeto.posicao.x - mundo.x, objeto.posicao.y - mundo.y, objeto.tamanhoX, objeto.tamanhoY, objeto.tamanhoX * objeto.frame, objeto.tamanhoY * objeto.animacao);
+	}
+	void desenhoNaTelaFundo(maps& objeto, ofVec2f& mundo)
+	{
+		objeto.street.draw(objeto.posicao - mundo);
+		if(objeto.bosslimit == true)
+		objeto.boss.draw(objeto.posicao - mundo);
 	}
 	void desenhoPowerUpDamage(powerUp& objeto, ofVec2f mundo)
 	{
-		 objeto.damage.draw(objeto.posicao - mundo);
+		objeto.damage.draw(objeto.posicao - mundo);
 	}
 	void desenhoPowerUpPotion(powerUp& objeto, ofVec2f mundo)
 	{
@@ -133,6 +153,10 @@ public:
 	}
 	void desenhoNaTelaTiro(golpes& objeto, ofVec2f& mundo, monstros& monstro)
 	{
+		/*ofPushMatrix();
+		ofTranslate(objeto.posicao);
+		ofRotateZ(objeto.angulo);*/
+
 		if (monstro.powerUpActive == false)
 			objeto.sprite.draw(objeto.posicao - mundo);
 		else
@@ -140,15 +164,51 @@ public:
 	}
 	void desenhoNaTelaMonstro(monstros& inimigo, ofVec2f& mundo)
 	{
-
+		                                                                                                                                                             
 		if (inimigo.atingido == false)
-			inimigo.sprite.draw(inimigo.posicao - mundo);
+			//inimigo.sprite.draw(inimigo.posicao - mundo);
+			inimigo.sprite.drawSubsection(inimigo.posicao.x - mundo.x, inimigo.posicao.y - mundo.y, inimigo.tamanhoX, inimigo.tamanhoY, inimigo.tamanhoX * inimigo.frame, inimigo.tamanhoY * inimigo.animacao);
 		else
-			inimigo.sprite2.draw(inimigo.posicao - mundo);
+			inimigo.sprite2.drawSubsection(inimigo.posicao.x - mundo.x, inimigo.posicao.y - mundo.y, inimigo.tamanhoX, inimigo.tamanhoY, inimigo.tamanhoX * inimigo.frame, inimigo.tamanhoY * inimigo.animacao);
 		if (inimigo.vida <= 10)
-			inimigo.sprite3.draw(inimigo.posicao - mundo);
+			inimigo.sprite3.drawSubsection(inimigo.posicao.x - mundo.x, inimigo.posicao.y - mundo.y, inimigo.tamanhoX, inimigo.tamanhoY, inimigo.tamanhoX * inimigo.frame, inimigo.tamanhoY * inimigo.animacao);
 	}
 
+	void desenhoNaTelaBoss(monstros& inimigo, ofVec2f& mundo)
+	{
+		inimigo.spriteBoss.drawSubsection(inimigo.posicao.x - mundo.x, inimigo.posicao.y - mundo.y, inimigo.tamanhoX, inimigo.tamanhoY, inimigo.animaTime * 0, 0);
+	}
+
+	//parando o dash para não ser infinito
+	void updateVector(ofVec2f& vec, float time) 
+	{
+		if (vec.x > 0) 
+		{
+
+			vec.x += (-player.acele * 40) * time;
+			if (vec.x < 0)
+				vec.x = 0;
+		}
+		else if (vec.x < 0) {
+
+			vec.x += (player.acele * 40) * time;
+			if (vec.x > 0)
+				vec.x = 0;
+		}
+
+		if (vec.y > 0) {
+
+			vec.y += (-player.acele * 40) * time;
+			if (vec.y < 0)
+				vec.y = 0;
+		}
+		else if (vec.y < 0) {
+
+			vec.y += (player.acele * 40) * time;
+			if (vec.y > 0)
+				vec.y = 0;
+		}
+	}
 
 	//FUNCAO DE COLISAO QUE PASSA O PLAYER E O QUE COLIDE
 	void colisao(personagem& P1, monstros& P2)
@@ -159,8 +219,7 @@ public:
 			P1.posicao.y + P1.tamanhoY > P2.posicao.y - P2.tamanhoY &&
 			P1.posicao.y - P1.tamanhoY < P2.posicao.y + P2.tamanhoY)
 		{
-			//Se colidir com objeto volta uma posicao em y
-			P1.posicao -= 2;
+			//Se colidir perde vida
 			P1.vida -= P2.dano;
 		}
 	}
@@ -174,15 +233,21 @@ public:
 			P1.posicao.y + P1.tamanhoY > P2.posicao.y - P2.tamanhoY &&
 			P1.posicao.y - P1.tamanhoY < P2.posicao.y + P2.tamanhoY)
 		{
-			//tiro.powerUpAtkActive = false;
+			P2.colidir = true;
 			P2.Ingame = false;
-			mosntro.powerUpActive = true;
-			if (P2.moredamage == true)
-				P1.dano = P2.dano;
-			else if (P2.cure == true)
-				P1.vida += P2.vida;
-
 			
+			if (P2.moredamage == true)
+			{
+				mosntro.powerUpActive = true;
+				P1.dano = P2.dano;
+				P2.moredamage = false;
+			}
+			if (P2.cure == true)
+			{
+				P1.vida += P2.vida;
+				P2.cure = false;
+			}
+
 		}
 	}
 	void colisaoTiro(monstros& T1, golpes& P1, personagem& P2)
@@ -201,19 +266,98 @@ public:
 			T1.IniDir = true;
 		}
 	}
-	//funcao que o inimigo segue o player 
-	void monstroSeguir(personagem jogador, monstros&  monstro)
+	void playerTiroBoss(monstros& boss, golpes& atakplayer, personagem& player)
 	{
+		//T1 = boss
+		//atakplayer = atakplayer
+		//P2 = player
+
+		//Colisao certa
+		if (atakplayer.posicao.x > boss.posicao.x - boss.tamanhoX && atakplayer.posicao.x < boss.posicao.x + boss.tamanhoX &&
+			atakplayer.posicao.y + atakplayer.tamanhoY > boss.posicao.y - boss.tamanhoY &&
+			atakplayer.posicao.y - atakplayer.tamanhoY < boss.posicao.y + boss.tamanhoY)
+		{
+			//Se colidir com objeto aumenta pontos, tira vida dos monstros e ativa a I.A 
+			player.colison = true;
+			boss.vida -= player.dano;
+			boss.atingido = true;
+		}
+	}
+	void colisaoTiroBoss(monstros& Boss, golpes& atakBoss, personagem& player)
+	{
+		if (atakBoss.posicao.x > player.posicao.x - player.tamanhoX && atakBoss.posicao.x < player.posicao.x + player.tamanhoX &&
+			atakBoss.posicao.y + atakBoss.tamanhoY > player.posicao.y - player.tamanhoY &&
+			atakBoss.posicao.y - atakBoss.tamanhoY < player.posicao.y + player.tamanhoY)
+		{
+			player.colison = true;
+			player.vida -= Boss.dano;
+			if (player.colison == true)
+				posTiroBoss(atakBoss, Boss);
+		}
+	}
+	void posTiroBoss(golpes& atakBoss, monstros& Boss)
+	{
+		atakBoss.posicao.x = Boss.posicao.x - 150;
+		atakBoss.posicao.y = Boss.posicao.y + 30;
+		atakBoss.posicao.x = Boss.posicao.x - 50;
+		atakBoss.posicao.y = Boss.posicao.y + 120;
+		atakBoss.posicao.x = Boss.posicao.x + 50;
+		atakBoss.posicao.y = Boss.posicao.y + 30;
+		atakBoss.posicao.x = Boss.posicao.x - 40;
+		atakBoss.posicao.y = Boss.posicao.y - 80;
+	}
+
+	//funcao que o inimigo segue o player 
+	void monstroSeguir(personagem& jogador, monstros&  monstro)
+	{
+		
 		monstro.path = jogador.posicao - monstro.posicao;
 		monstro.path.normalize();
 		monstro.vel += monstro.acele + abs(monstro.vel.x) + abs(monstro.vel.y);
 		monstro.vel = monstro.path * monstro.vel.length();
 	}
+	void tiroBossSeguir(personagem& jogador, golpes& ataqueBoss)
+	{
+		ataqueBoss.path = jogador.posicao - ataqueBoss.posicao;
+		ataqueBoss.path.normalize();
+		ataqueBoss.vel += ataqueBoss.acele + abs(ataqueBoss.vel.x) + abs(ataqueBoss.vel.y);
+		ataqueBoss.vel = ataqueBoss.path * ataqueBoss.vel.length();
+	}
+
+	void ataqueTiros(monstros& boss, golpes& atakBoss)
+	{
+		boss.waitTime += 1;
+		tiroBossSeguir(player, atakBoss);
+		if (Boss.vida >= 60)
+		{
+			atakBoss.vel.limit(500);
+			if (boss.waitTime >= 15)
+			{
+				posTiroBoss(ataqueBoss[0], boss);
+				posTiroBoss(ataqueBoss[1], boss);
+				posTiroBoss(ataqueBoss[2], boss);
+				posTiroBoss(ataqueBoss[3], boss);
+				boss.waitTime = 0;
+			}
+		}
+		else if (Boss.vida < 60 && Boss.vida >= 30)
+		{
+			atakBoss.vel.limit(600);
+			if (boss.waitTime >= 25)
+			{
+				posTiroBoss(ataqueBoss[0], boss);
+				posTiroBoss(ataqueBoss[1], boss);
+				posTiroBoss(ataqueBoss[2], boss);
+				posTiroBoss(ataqueBoss[3], boss);
+				boss.waitTime = 0;
+			}
+		}
+	}
 
 	void sorteioDrop(monstros& inimigo)
 	{
 		int sorteio = rand() % 200;
-		
+
 		if (sorteio < 50)
 		{
 			inimigo.powerUpActive = true;
@@ -229,27 +373,38 @@ public:
 			potion.cure = true;
 		}
 	}
+	void BossDrop(monstros& Boss, powerUp& potion)
+	{
+		int sort = rand() % 100;
+
+		if (sort < 25)
+		{
+			potion.vida = (60 + rand() % 100);
+			Boss.powerUpActive = false;
+			potion.posicao.x = (620);
+			potion.posicao.y = (500);
+			potion.Ingame = true;
+			potion.cure = true;
+		}
+	}
 	void travaTela(personagem& P1)
 	{
 		//travando em y
 		if (P1.posicao.y > 1100)
 		{
-			
-			P1.acele = 0.1f;
-			//P1.posicao.y -= 4;
+			P1.posicao.y -= 4;
+			P1.vel.set(0, 0);
 		}
 		else if (P1.posicao.y < 400)
 		{
-			
-			P1.vel.limit(0);
-			//P1.posicao.y += 4;
+			P1.posicao.y += 4;
+			P1.vel.set(0, 0);
 		}
 		//travando o player na tela em x
-		if (P1.posicao.x < 300)
+		if (P1.posicao.x < 500)
 		{
-			
-			P1.vel.limit(0);
-			//P1.posicao.x += 4;
+			P1.posicao.x += 4;
+			P1.vel.set(0, 0);
 		}
 	}
 
@@ -257,42 +412,66 @@ public:
 	void movimento(personagem& P1, golpes& T1)
 	{
 		if (P1.Up == true)
-		{
 			P1.vel.y -= P1.acele;
-		}
 		//movimenta para baixo
 		if (P1.Down == true)
-		{
 			P1.vel.y += P1.acele;
-		}
 		//moviemnta para esquerda
 		if (P1.Left == true)
-		{
-
 			P1.vel.x -= P1.acele;
-		}
-		//movimenta para direita (e so atira para direita)
-		if (P1.Right == true)
-		{
+		//movimenta para direita
+		if (P1.Right == true)                    
 			P1.vel.x += P1.acele;
-		}
-
 		P1.vel.limit(500);
-		
-		
 		//Tiro sempre segue o player e se colidir com inimigo volta
 		if (T1.acompanhando == true || P1.colison == true)
 		{
-			T1.posicao = P1.posicao;
+			T1.posicao =  P1.posicao;
 			P1.colison = false;
 		}
 		//tiro movimenta se pressionado x
 		else if (T1.Tiro == true)
-		{
 			T1.vel.x = T1.acele;
-		}
-	}
 
+	}
+	void animimarPlayer(personagem& player)
+	{
+		
+		if (player.temAnimacao > 1500.0f)
+		{
+			player.frame += 1;
+			player.temAnimacao = 0.0f;
+			if (player.frame > 8)
+				player.frame = 1;
+		}
+		if (player.vel.x == 0 || player.vel.y == 0)
+		{
+			player.animacao = 0;
+			player.frame = 0;
+		}
+			if (player.vel.x > 0)
+			player.animacao = 0;
+		else if (player.vel.x < 0)
+			player.animacao = 1;
+	}
+	void animarInimigos(monstros& inimigo)
+	{
+		
+			inimigo.tempAnimacao += abs(inimigo.vel.x) + abs(inimigo.vel.y);
+
+			if (inimigo.tempAnimacao > 900.0f)
+			{
+				inimigo.frame += 1;
+				inimigo.tempAnimacao = 0.0f;
+			}
+			if (inimigo.frame > 3)
+				inimigo.frame = 0;
+			if (inimigo.vel.x > 0)
+				inimigo.animacao = 0;
+			else if (inimigo.vel.x < 0)
+				inimigo.animacao = 1;
+		
+	}
 	void movimentoInimigo(monstros &inimigo, personagem& player)
 	{
 		inimigo.vel.limit(100);
@@ -363,5 +542,57 @@ public:
 			}
 		}
 	}
-
+	void iddle1(monstros& Boss, golpes& atakBoss)
+	{
+		Boss.waveTime += 1.0f;
+		if (Boss.waveTime >= 120.0f)
+		{
+			
+			ataqueTiros(Boss, ataqueBoss[0]);
+			ataqueTiros(Boss, ataqueBoss[1]);
+			ataqueTiros(Boss, ataqueBoss[2]);
+			ataqueTiros(Boss, ataqueBoss[3]);
+			Boss.waveTime = 0.0f;
+		}
+		if (Boss.waveTime == 0.0f)
+			posTiroBoss(atakBoss, Boss);
+	}
+	void iddle3(monstros& Boss, personagem& player)
+	{
+		if (Boss.Tptime > 10.0f)
+		{
+			//Boss.posicao.x = (5600 + (rand () % 1800));
+			//Boss.posicao.y = (500 + (rand () % 500));
+			Boss.posicao.x = (500 + (rand() % 500));
+			Boss.posicao.y = (400 + (rand() & 300));
+			Boss.vel.limit(700);
+			Boss.Tptime = 0.0f;
+		}
+	}
+	void movimentoBoss(monstros& Boss)
+	{
+		Boss.vel.limit(200);
+		if (Boss.IniSub == true)
+		{
+			Boss.vel.y -= Boss.acele;
+			if (Boss.posicao.y < 400)
+			{
+				Boss.vel.set(1, 1);
+				Boss.IniSub = false;
+				Boss.IniDesc = true;
+			}
+		}
+		if (Boss.IniDesc == true)
+		{
+			Boss.vel.y += Boss.acele;
+			if (Boss.posicao.y > 1100)
+			{
+				Boss.vel.set(1, 1);
+				Boss.IniSub = true;
+				Boss.IniDesc = false;
+			}
+		}
+		
+	}
+	
 };
