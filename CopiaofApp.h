@@ -35,7 +35,7 @@ void ofApp::setup()
 	player.shooting.loadSound("Sonorizacao/Boomerang_Player.WAV", true);
 
 	//definicoes powerUp de dano
-	damageUp.dano = 3;
+	damageUp.dano = 2;
 	damageUp.damage.loadImage("players/PowerUpForca.png");
 	damageUp.damage.setAnchorPoint(damageUp.damage.getWidth() / 2, damageUp.damage.getHeight() / 2);
 	damageUp.tamanhoY = damageUp.damage.getHeight() / 2;
