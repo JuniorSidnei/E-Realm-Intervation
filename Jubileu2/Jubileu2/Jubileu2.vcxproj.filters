@@ -20,12 +20,6 @@
     <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inimigo.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Personagem.h">
-      <Filter>src</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
