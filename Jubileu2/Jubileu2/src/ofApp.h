@@ -391,8 +391,7 @@ public:
 	}
 	void travaTela(personagem& P1)
 	{
-		if (estadoJogo == GamePlay)
-		{
+		
 			//travando em y
 			if (P1.posicao.y > 1100)
 			{
@@ -410,20 +409,22 @@ public:
 				P1.posicao.x += 4;
 				P1.vel.set(0, 0);
 			}
-		}
-		else
 
-			if (P1.posicao.y > 1300)
-			{
+	}
+
+	void travatelaTutorial(personagem& P1)
+	{
+		if (P1.posicao.y > 1300)
+		{
 				P1.posicao.y -= 4;
 				P1.vel.set(0, 0);
-			}
-			else if (P1.posicao.y < 400)
-			{
+		}
+		else if (P1.posicao.y < 400)
+		{
 				P1.posicao.y += 4;
 				P1.vel.set(0, 0);
-			}
-		//travando o player na tela em x
+		}
+
 		if (P1.posicao.x < 500)
 		{
 			P1.posicao.x += 4;
@@ -482,7 +483,7 @@ public:
 		else if (player.vel.x < 0)
 			player.animacao = 1;
 	}
-	void animarInimigos(monstros& inimigo)
+	void animarInimigos(monstros& inimigo, personagem& player)
 	{
 
 		inimigo.tempAnimacao += abs(inimigo.vel.x) + abs(inimigo.vel.y);
@@ -491,14 +492,22 @@ public:
 		{
 			inimigo.frame += 1;
 			inimigo.tempAnimacao = 0.0f;
+			if (inimigo.frame > 2)
+				inimigo.frame = 0;
 		}
-		if (inimigo.frame > 3)
-			inimigo.frame = 0;
 		if (inimigo.vel.x > 0)
 			inimigo.animacao = 0;
 		else if (inimigo.vel.x < 0)
 			inimigo.animacao = 1;
 
+		if (inimigo.vida <= 0)
+		{
+			inimigo.animacao = 5;
+			inimigo.frame += 1;
+			if (inimigo.frame > 2)
+				inimigo.frame = 0;
+		}
+		
 	}
 	void movimentoInimigo(monstros &inimigo, personagem& player)
 	{

@@ -106,10 +106,10 @@ void ofApp::setup()
 	//definicoes do tiro
 	ataque.sprite.loadImage("players/armaPlayer.png");
 	ataque.sprite2.loadImage("players/armaPlayerUp1.png");
-	ataque.tamanhoX = ataque.sprite.getHeight() / 2;
-	ataque.tamanhoX = ataque.sprite.getWidth() / 2;
-	ataque.sprite.setAnchorPoint(ataque.sprite.getWidth() / 2, ataque.sprite.getHeight() / 2);
-	ataque.sprite2.setAnchorPoint(ataque.sprite2.getWidth() / 2, ataque.sprite2.getHeight() / 2);
+	ataque.tamanhoX = ataque.sprite.getHeight();
+	ataque.tamanhoY = ataque.sprite.getWidth() ;
+	ataque.sprite.setAnchorPoint(ataque.sprite.getWidth(), ataque.sprite.getHeight());
+	ataque.sprite2.setAnchorPoint(ataque.sprite2.getWidth(), ataque.sprite2.getHeight());
 	ataque.acele = 950.0f;
 	ataque.acompanhando = true;
 
@@ -153,7 +153,7 @@ void ofApp::update()
 		animimarPlayer(player);
 		colisao(player, inimigoTutorial);
 		colisaoTiro(inimigoTutorial, ataque, player);
-		travaTela(player);
+		travatelaTutorial(player);
 
 		break;
 
@@ -168,7 +168,7 @@ void ofApp::update()
 
 			for (int i = 0; i < Ninimigo; i++)
 			{
-				animarInimigos(inimigo[i]);
+				animarInimigos(inimigo[i], player);
 			}
 			animimarPlayer(player);
 
