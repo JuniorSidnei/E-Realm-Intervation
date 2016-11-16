@@ -34,7 +34,7 @@ void ofApp::setup()
 	player.vida = 400;
 	player.walking.loadSound("Sonorizacao/Player_Running.WAV", true);
 	player.shooting.loadSound("Sonorizacao/Boomerang_Player.WAV", true);
-	
+	player.playerBox.setSize(player.tamanhoX, player.tamanhoY);
 
 	//definicoes powerUp de dano
 	damageUp.dano = 2;
@@ -165,7 +165,8 @@ void ofApp::update()
 		//setando a caixa de colisao exatamente a partir do centro da imagem
 		ataque.projetilBox.x = (ataque.posicao.x - ataque.sprite.getWidth() / 2);
 		ataque.projetilBox.y = (ataque.posicao.y - ataque.sprite.getHeight() / 2);
-
+		player.playerBox.x = (player.posicao.x - player.sprite.getWidth() / 2);
+		player.playerBox.y = (player.posicao.y - player.sprite.getHeight() / 2);
 
 		if (player.vida > 0)
 		{
@@ -177,6 +178,12 @@ void ofApp::update()
 			for (int i = 0; i < Ninimigo; i++)
 			{
 				animarInimigos(inimigo[i], player);
+				inimigo[i].mosntrosBox.x = (inimigo[i].posicao.x - inimigo[i].sprite.getWidth() / 2);
+				inimigo[i].mosntrosBox.y = (inimigo[i].posicao.y - inimigo[i].sprite.getHeight() / 2);
+				inimigo[i].mosntrosBox.x = (inimigo[i].posicao.x - inimigo[i].sprite2.getWidth() / 2);
+				inimigo[i].mosntrosBox.y = (inimigo[i].posicao.y - inimigo[i].sprite2.getHeight() / 2);
+				inimigo[i].mosntrosBox.x = (inimigo[i].posicao.x - inimigo[i].sprite3.getWidth() / 2);
+				inimigo[i].mosntrosBox.y = (inimigo[i].posicao.y - inimigo[i].sprite3.getHeight() / 2);
 			}
 			animimarPlayer(player);
 
@@ -328,7 +335,7 @@ void ofApp::draw()
 			desenhoNaTelaFundo(fundo, camera);
 
 			ofDrawRectangle(ataque.projetilBox - camera);
-			ofDrawRectangle(inimigo[0].mosntrosBox - camera);
+			ofDrawRectangle(player.playerBox - camera);
 
 			//HUD
 			for (int i = 0; i < player.vida; i++)
@@ -354,6 +361,7 @@ void ofApp::draw()
 			//HUD ENEMYS
 			for (int i = 0; i < Ninimigo; i++)
 			{
+				ofDrawRectangle(inimigo[i].mosntrosBox - camera);
 				if (inimigo[i].vida > 0)
 				{
 					for (int j = 0; j < inimigo[i].vida; j++)

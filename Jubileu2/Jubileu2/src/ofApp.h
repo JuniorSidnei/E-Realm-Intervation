@@ -58,6 +58,7 @@ public:
 		ofImage lifePlayer;
 		ofSoundPlayer walking;
 		ofSoundPlayer shooting;
+		ofRectangle playerBox;
 		float tamanhoX, tamanhoY, tamanhoXLife, tamanhoYLife, temAnimacao;
 		float acele, tempSom, animacao, frame;
 		int vida, pontos = 0, dano = 1, continues;
