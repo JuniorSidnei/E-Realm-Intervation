@@ -104,6 +104,7 @@ public:
 		ofImage EnemyBar;
 		ofImage EnemyLife;
 		ofSoundPlayer scream;
+		ofRectangle mosntrosBox;
 		float tamanhoX, tamanhoY, tamanhoXLife, tamanhoYLife;
 		float acele, animaTime, waveTime, somTime, Tptime, frame, animacao, tempAnimacao;
 		int vida, dano = 2, waitTime;
@@ -126,6 +127,7 @@ public:
 		ofVec2f path;
 		ofImage sprite;
 		ofImage sprite2;
+		ofRectangle projetilBox;
 		float tamanhoX, tamanhoY;
 		float acele, angulo;
 		bool Tiro = false;
@@ -254,11 +256,12 @@ public:
 	}
 	void colisaoTiro(monstros& T1, golpes& P1, personagem& P2)
 	{
-
-		//Colisao certa
-		if (P1.posicao.x > T1.posicao.x - T1.tamanhoX && P1.posicao.x < T1.posicao.x + T1.tamanhoX &&
-			P1.posicao.y + P1.tamanhoY > T1.posicao.y - T1.tamanhoY &&
-			P1.posicao.y - P1.tamanhoY < T1.posicao.y + T1.tamanhoY)
+		
+		////Colisao certa
+		//if (P1.posicao.x > T1.posicao.x - T1.tamanhoX && P1.posicao.x < T1.posicao.x + T1.tamanhoX &&
+		//	P1.posicao.y + P1.tamanhoY > T1.posicao.y - T1.tamanhoY &&
+		//	P1.posicao.y - P1.tamanhoY < T1.posicao.y + T1.tamanhoY)
+		if(P1.projetilBox.intersects(T1.mosntrosBox))
 		{
 			//Se colidir com objeto aumenta pontos, tira vida dos monstros e ativa a I.A 
 			P2.pontos += 5;

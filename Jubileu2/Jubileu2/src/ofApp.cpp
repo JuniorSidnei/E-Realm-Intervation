@@ -34,6 +34,7 @@ void ofApp::setup()
 	player.vida = 400;
 	player.walking.loadSound("Sonorizacao/Player_Running.WAV", true);
 	player.shooting.loadSound("Sonorizacao/Boomerang_Player.WAV", true);
+	
 
 	//definicoes powerUp de dano
 	damageUp.dano = 2;
@@ -62,9 +63,9 @@ void ofApp::setup()
 		inimigo[i].tamanhoX = inimigo[i].sprite.getWidth() / 3;
 		inimigo[i].tamanhoXLife = inimigo[i].EnemyLife.getWidth();
 		inimigo[i].tamanhoYLife = inimigo[i].EnemyLife.getHeight();
-		inimigo[i].sprite.setAnchorPoint(inimigo[i].tamanhoX, inimigo[i].tamanhoY);
-		inimigo[i].sprite2.setAnchorPoint(inimigo[i].tamanhoX, inimigo[i].tamanhoY);
-		inimigo[i].sprite3.setAnchorPoint(inimigo[i].tamanhoX, inimigo[i].tamanhoY);
+		inimigo[i].sprite.setAnchorPercent(0.5, 0.5);
+		inimigo[i].sprite2.setAnchorPercent(0.5, 0.5);
+		inimigo[i].sprite3.setAnchorPercent(0.5, 0.5);
 		inimigo[i].acele = 1.0f;
 		inimigo[i].IniSub = true;
 		inimigo[i].vida = 30;
@@ -72,6 +73,7 @@ void ofApp::setup()
 		inimigo[i].EnemyLife.loadImage("players/LifeEnemy.png");
 		inimigo[i].EnemyBar.resize(100, inimigo[i].EnemyBar.getHeight());
 		inimigo[i].EnemyLife.resize(14, inimigo[i].EnemyLife.getHeight());
+		inimigo[i].mosntrosBox.setSize(inimigo[i].tamanhoX, inimigo[i].tamanhoY);
 	}
 
 	inimigoTutorial.posicao.x = 700;
@@ -108,10 +110,11 @@ void ofApp::setup()
 	ataque.sprite2.loadImage("players/armaPlayerUp1.png");
 	ataque.tamanhoX = ataque.sprite.getHeight();
 	ataque.tamanhoY = ataque.sprite.getWidth() ;
-	ataque.sprite.setAnchorPoint(ataque.sprite.getWidth(), ataque.sprite.getHeight());
-	ataque.sprite2.setAnchorPoint(ataque.sprite2.getWidth(), ataque.sprite2.getHeight());
+	ataque.sprite.setAnchorPercent(0.5, 0.5);
+	ataque.sprite2.setAnchorPercent(0.5, 0.5);
 	ataque.acele = 950.0f;
 	ataque.acompanhando = true;
+	ataque.projetilBox.setSize(ataque.sprite.getWidth(), ataque.sprite.getHeight());
 
 	//definicoes tiro boss
 	for (int i = 0; i < 4; i++)
@@ -158,6 +161,11 @@ void ofApp::update()
 		break;
 
 	case GamePlay:
+		
+		//setando a caixa de colisao exatamente a partir do centro da imagem
+		ataque.projetilBox.x = (ataque.posicao.x - ataque.sprite.getWidth() / 2);
+		ataque.projetilBox.y = (ataque.posicao.y - ataque.sprite.getHeight() / 2);
+
 
 		if (player.vida > 0)
 		{
@@ -206,6 +214,7 @@ void ofApp::update()
 			for (int i = 0; i < Ninimigo; i++)
 			{
 				inimigo[i].posicao += inimigo[i].vel * time;
+				inimigo[i].mosntrosBox.setPosition(inimigo[i].posicao);
 				if (damageUp.colidir == false || potion.colidir == false)
 				{
 					colisaoPowerUp(player, damageUp, inimigo[i]);
@@ -299,6 +308,7 @@ void ofApp::draw()
 		FundoMenu.draw(0, 0);
 		break;
 	case Tutorial:
+
 		desenhoNaTelaFundo(fundoTutorial, camera);
 		desenhoNaTela(player, camera);
 		desenhoNaTelaMonstro(inimigoTutorial, camera);
@@ -308,6 +318,8 @@ void ofApp::draw()
 		break;
 	case GamePlay:
 
+		
+
 		if (player.vida > 0)
 		{
 
@@ -315,6 +327,8 @@ void ofApp::draw()
 			//fundo do jogo
 			desenhoNaTelaFundo(fundo, camera);
 
+			ofDrawRectangle(ataque.projetilBox - camera);
+			ofDrawRectangle(inimigo[0].mosntrosBox - camera);
 
 			//HUD
 			for (int i = 0; i < player.vida; i++)
