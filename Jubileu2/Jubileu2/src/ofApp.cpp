@@ -3,12 +3,13 @@
 void ofApp::setup()
 {
 	//Imagem de fundo
+	FundoMenu.loadImage("Menu/FundoMenu.png");
 	fundo.posicao.x = 0;
 	fundo.posicao.y = 0;
 	fundo.street.loadImage("Cenario/Rua2.png");
-
-	FundoMenu.loadImage("Menu/FundoMenu.png");
-
+	fundoTutorial.posicao.x = 0;
+	fundoTutorial.posicao.y = 0;
+	fundoTutorial.street.loadImage("Menu/FundoTutorial.png");
 
 
 
@@ -23,7 +24,7 @@ void ofApp::setup()
 	player.posicao.x = 600;
 	player.posicao.y = 700;
 	player.sprite.loadImage("players/sprite_jogadorpack3.png");
-	player.sprite.resize(1200, 200);
+	player.sprite.resize(1200, 300);
 	player.tamanhoY = player.sprite.getHeight() / 2;
 	player.tamanhoX = player.sprite.getWidth() / 9;
 	player.tamanhoXLife = player.lifePlayer.getWidth() / 2;
@@ -72,6 +73,15 @@ void ofApp::setup()
 		inimigo[i].EnemyBar.resize(100, inimigo[i].EnemyBar.getHeight());
 		inimigo[i].EnemyLife.resize(14, inimigo[i].EnemyLife.getHeight());
 	}
+
+	inimigoTutorial.posicao.x = 700;
+	inimigoTutorial.posicao.y = 700;
+	inimigoTutorial.sprite.loadImage("players/Sprite_pack_inimigos.png");
+	inimigoTutorial.sprite2.loadImage("players/Sprite_pack_inimigos-verdes.png");
+	inimigoTutorial.sprite3.loadImage("players/Sprite_pack_inimigos-cinzas.png");
+	inimigoTutorial.tamanhoY = inimigoTutorial.sprite.getHeight() / 6;
+	inimigoTutorial.tamanhoX = inimigoTutorial.sprite.getWidth() / 3;
+	inimigoTutorial.sprite.setAnchorPoint(inimigoTutorial.tamanhoX, inimigoTutorial.tamanhoY);
 
 	//definicoes boss
 	Boss.posicao.x = 7000;
@@ -132,6 +142,21 @@ void ofApp::update()
 
 	switch (estadoJogo)
 	{
+	case Tutorial:
+
+		player.posicao += (player.dash + player.vel) * time;
+		camera = player.posicao - ofVec2f(ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
+		ataque.posicao += ataque.vel * time;
+		movimento(player, ataque);
+		player.temAnimacao += abs(player.vel.x) + abs(player.vel.y);
+		updateVector(player.dash, time);
+		animimarPlayer(player);
+		colisao(player, inimigoTutorial);
+		colisaoTiro(inimigoTutorial, ataque, player);
+		travaTela(player);
+
+		break;
+
 	case GamePlay:
 
 		if (player.vida > 0)
@@ -170,12 +195,6 @@ void ofApp::update()
 			{
 				ataqueBoss[i].posicao += ataqueBoss[i].vel * time;
 			}
-			//setando as posicoes x e y mais a velocidade multiplicada pelo tempo
-			/*for (int i = 0; i < Ninimigo; i++)
-			{
-			inimigo[i].posicao += inimigo[i].vel * time;
-			}*/
-
 
 			//travando o player na tela em x,y
 			travaTela(player);
@@ -279,7 +298,14 @@ void ofApp::draw()
 
 		FundoMenu.draw(0, 0);
 		break;
+	case Tutorial:
+		desenhoNaTelaFundo(fundoTutorial, camera);
+		desenhoNaTela(player, camera);
+		desenhoNaTelaMonstro(inimigoTutorial, camera);
+		desenhoNaTelaTiro(ataque, camera, inimigoTutorial);
+		ofDrawBitmapString("Posicao do player: " + ofToString(player.posicao), 10, 10);
 
+		break;
 	case GamePlay:
 
 		if (player.vida > 0)
@@ -304,6 +330,7 @@ void ofApp::draw()
 				player.lifeBarPlayer2.draw(10, 80);
 			else
 				player.lifeBarPlayer3.draw(10, 80);
+
 			/*for (int i = 0; i < Boss.vida; i++)
 			{
 			Boss.BossLife.draw(10 + (i * Boss.tamanhoXLife), 120);
@@ -399,25 +426,77 @@ void ofApp::keyPressed(int key)
 	{
 	case Menu:
 		if (key == '1')
+			estadoJogo = Tutorial;
+		 if (key == '2')
 			estadoJogo = GamePlay;
+		 if (key == '3')
+			break;
+		break;
+	case Tutorial:
+		//se a tecla estiver sendo pressionada, movimenta
+		if (key == OF_KEY_UP)
+		{
+
+			player.Up = true;
+		}
+		if (key == OF_KEY_DOWN)
+		{
+
+			player.Down = true;
+
+		}
+		if (key == OF_KEY_RIGHT)
+		{
+
+			player.Right = true;
+			if (ataque.Tiro == false) {
+				ataque.acele = 950.0f;
+			}
+		}
+		if (key == OF_KEY_LEFT)
+		{
+			player.Left = true;
+			if (ataque.Tiro == false) {
+				ataque.acele = -950.0f;
+			}
+		}
+		//tiro do personagem ativado e moviementa
+		if (key == 'x' || key == 'X')
+		{
+			player.shooting.play();
+			ataque.acompanhando = false;
+			ataque.Tiro = true;
+		}
+		//Dashs em x e y 
+		if (key == 'c')
+			player.dash.set(600, 0);
+		if (key == 'z')
+			player.dash.set(-600, 0);
+		if (key == 'a')
+			player.dash.set(0, 600);
+		if (key == 'd')
+			player.dash.set(0, -600);
+		if (key == 'm')
+			estadoJogo = Menu;
+
 		break;
 
 	case GamePlay:
 		//se a tecla estiver sendo pressionada, movimenta
 		if (key == OF_KEY_UP)
 		{
-			//player.walking.play();
+			
 			player.Up = true;
 		}
 		if (key == OF_KEY_DOWN)
 		{
-			//player.walking.play();
+			
 			player.Down = true;
 
 		}
 		if (key == OF_KEY_RIGHT)
 		{
-			//player.walking.play();
+			
 			player.Right = true;
 			if (ataque.Tiro == false) {
 				ataque.acele = 950.0f;
@@ -470,6 +549,40 @@ void ofApp::keyReleased(int key)
 {
 	switch (estadoJogo)
 	{
+	case Tutorial:
+		//se a telca não estiver sendo pressionada, para movimento
+		if (key == OF_KEY_UP || key == 'w')
+		{
+
+			player.vel.y = 5;
+			player.Up = false;
+		}
+		if (key == OF_KEY_DOWN || key == 's')
+		{
+
+			player.vel.y = 5;
+			player.Down = false;
+		}
+		if (key == OF_KEY_RIGHT || key == 'd')
+		{
+
+			player.vel.x = 0;
+			player.Right = false;
+		}
+		if (key == OF_KEY_LEFT || key == 'a')
+		{
+
+			player.vel.x = 0;
+			player.Left = false;
+		}
+		if (key == 'x')
+		{
+			player.shooting.stop();
+			ataque.acompanhando = true;
+			ataque.Tiro = false;
+		}
+
+		break;
 	case GamePlay:
 
 		//se a telca não estiver sendo pressionada, para movimento

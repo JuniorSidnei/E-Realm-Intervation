@@ -4,8 +4,9 @@
 #include "ofMain.h"
 #define Ninimigo 6
 #define Menu 1
-#define GamePlay 2
-#define GameOver 3
+#define Tutorial 2
+#define GamePlay 3
+#define GameOver 4
 
 
 class ofApp : public ofBaseApp
@@ -39,7 +40,8 @@ public:
 	//Imagens da HUD
 	ofImage FundoMenu;
 
-	int estadoJogo = GamePlay;
+
+	int estadoJogo = Menu;
 
 	//personagem completo
 	struct personagem
@@ -69,10 +71,10 @@ public:
 	{
 		ofVec2f posicao;
 		ofImage street;
-		ofImage boss;
 		bool bosslimit = false;
 	};
 	maps fundo;
+	maps fundoTutorial;
 
 	struct powerUp
 	{
@@ -113,6 +115,7 @@ public:
 
 
 	monstros inimigo[Ninimigo];
+	monstros inimigoTutorial;
 	monstros Boss;
 
 	//
@@ -129,7 +132,7 @@ public:
 		bool acompanhando = false; bool Dir = false;
 		bool powerUpAtkActive = false;
 	};
-	//preciso mudar esse nome de variavel
+	
 	golpes ataque;
 	golpes ataqueBoss[4];
 
@@ -140,8 +143,8 @@ public:
 	void desenhoNaTelaFundo(maps& objeto, ofVec2f& mundo)
 	{
 		objeto.street.draw(objeto.posicao - mundo);
-		if (objeto.bosslimit == true)
-			objeto.boss.draw(objeto.posicao - mundo);
+		/*if (objeto.bosslimit == true)
+			objeto.boss.draw(objeto.posicao - mundo);*/
 	}
 	void desenhoPowerUpDamage(powerUp& objeto, ofVec2f mundo)
 	{
@@ -166,7 +169,6 @@ public:
 	{
 
 		if (inimigo.atingido == false)
-			//inimigo.sprite.draw(inimigo.posicao - mundo);
 			inimigo.sprite.drawSubsection(inimigo.posicao.x - mundo.x, inimigo.posicao.y - mundo.y, inimigo.tamanhoX, inimigo.tamanhoY, inimigo.tamanhoX * inimigo.frame, inimigo.tamanhoY * inimigo.animacao);
 		else
 			inimigo.sprite2.drawSubsection(inimigo.posicao.x - mundo.x, inimigo.posicao.y - mundo.y, inimigo.tamanhoX, inimigo.tamanhoY, inimigo.tamanhoX * inimigo.frame, inimigo.tamanhoY * inimigo.animacao);
@@ -389,21 +391,47 @@ public:
 	}
 	void travaTela(personagem& P1)
 	{
-		//travando em y
-		if (P1.posicao.y > 1100)
+		if (estadoJogo == GamePlay)
 		{
-			P1.posicao.y -= 4;
-			P1.vel.set(0, 0);
+			//travando em y
+			if (P1.posicao.y > 1100)
+			{
+				P1.posicao.y -= 4;
+				P1.vel.set(0, 0);
+			}
+			else if (P1.posicao.y < 400)
+			{
+				P1.posicao.y += 4;
+				P1.vel.set(0, 0);
+			}
+			//travando o player na tela em x
+			if (P1.posicao.x < 500)
+			{
+				P1.posicao.x += 4;
+				P1.vel.set(0, 0);
+			}
 		}
-		else if (P1.posicao.y < 400)
-		{
-			P1.posicao.y += 4;
-			P1.vel.set(0, 0);
-		}
+		else
+
+			if (P1.posicao.y > 1300)
+			{
+				P1.posicao.y -= 4;
+				P1.vel.set(0, 0);
+			}
+			else if (P1.posicao.y < 400)
+			{
+				P1.posicao.y += 4;
+				P1.vel.set(0, 0);
+			}
 		//travando o player na tela em x
 		if (P1.posicao.x < 500)
 		{
 			P1.posicao.x += 4;
+			P1.vel.set(0, 0);
+		}
+		if (P1.posicao.x > 1300)
+		{
+			P1.posicao.x -= 4;
 			P1.vel.set(0, 0);
 		}
 	}
