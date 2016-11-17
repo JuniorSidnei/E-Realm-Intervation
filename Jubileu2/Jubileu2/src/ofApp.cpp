@@ -166,27 +166,14 @@ void ofApp::update()
 
 	case GamePlay:
 		
-		//setando a caixa de colisao exatamente a partir do centro da imagem
-		ataque.projetilBox.x = (ataque.posicao.x - ataque.tamanhoX);
-		ataque.projetilBox.y = (ataque.posicao.y - ataque.tamanhoY);
-		player.playerBox.x = (player.posicao.x - player.tamanhoX);
-		player.playerBox.y = (player.posicao.y - player.tamanhoY);
-		damageUp.powerupBox.x = (damageUp.posicao.x - damageUp.tamanhoX);
-		damageUp.powerupBox.y = (damageUp.posicao.y - damageUp.tamanhoY);
-		potion.powerupBox.x = (potion.posicao.x - potion.tamanhoX);
-		potion.powerupBox.y = (potion.posicao.y - potion.tamanhoY);
-		for (int i = 0; i < Ninimigo; i++)
-		{
-			animarInimigos(inimigo[i], player);
-			inimigo[i].mosntrosBox.x = (inimigo[i].posicao.x - inimigo[i].tamanhoX);
-			inimigo[i].mosntrosBox.y = (inimigo[i].posicao.y - inimigo[i].tamanhoY);
-			inimigo[i].mosntrosBox.x = (inimigo[i].posicao.x - inimigo[i].tamanhoX);
-			inimigo[i].mosntrosBox.y = (inimigo[i].posicao.y - inimigo[i].tamanhoY);
-			inimigo[i].mosntrosBox.x = (inimigo[i].posicao.x - inimigo[i].tamanhoX);
-			inimigo[i].mosntrosBox.y = (inimigo[i].posicao.y - inimigo[i].tamanhoY);
-		}
+		
+		
 		if (player.vida > 0)
 		{
+			///Setando a caixa de colisao exatamente a partir do centro da imagem
+			for (int i = 0; i < Ninimigo; i++)
+				boxColisoes(player, damageUp, potion, ataque, inimigo[i]);
+			
 			//som de passos
 			/*if (player.tempSom > 30.0f)
 			{
@@ -195,7 +182,7 @@ void ofApp::update()
 			}*/
 
 			
-			//PLAYER
+			///Player
 			
 			//player no jogo
 
@@ -222,7 +209,7 @@ void ofApp::update()
 			//Dash parando
 			updateVector(player.dash, time);
 
-			//INIMIGOS E JOGADOR
+			///Inimigos e jogador
 
 			//Inimigos e jogador no jogo 
 			for (int i = 0; i < Ninimigo; i++)
@@ -305,16 +292,16 @@ void ofApp::draw()
 				player.lifeBarPlayer3.draw(10, 80);
 
 			//Barra de vida do Boss
-			if (player.covilBoss == true)
+			/*if (player.covilBoss == true)
 			{
 				for (int i = 0; i < Boss.vida; i++)
 				{
 					Boss.BossLife.draw(480 + (i * Boss.tamanhoXLife), 80);
 				}
 				Boss.Bossbar.draw(480, 80);
-			}
+			}*/
 
-			//HUD ENEMYS
+			///HUD ENEMYS
 			for (int i = 0; i < Ninimigo; i++)
 			{
 				/*ofDrawRectangle(inimigo[i].mosntrosBox - camera);*/
@@ -322,9 +309,9 @@ void ofApp::draw()
 				{
 					for (int j = 0; j < inimigo[i].vida; j++)
 					{
-						inimigo[i].EnemyLife.draw(((inimigo[i].posicao.x + (j * 3)) - 60) - camera.x, (inimigo[i].posicao.y - 70) - camera.y);
+						inimigo[i].EnemyLife.draw(((inimigo[i].posicao.x + (j * 3))) - camera.x, (inimigo[i].posicao.y - 10) - camera.y);
 					}
-					inimigo[i].EnemyBar.draw((inimigo[i].posicao.x - 60) - camera.x, (inimigo[i].posicao.y - 70) - camera.y);
+					inimigo[i].EnemyBar.draw((inimigo[i].posicao.x) - camera.x, (inimigo[i].posicao.y - 10) - camera.y);
 				}
 			}
 

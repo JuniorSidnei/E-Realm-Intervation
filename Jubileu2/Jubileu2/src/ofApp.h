@@ -2,7 +2,7 @@
 
 
 #include "ofMain.h"
-#define Ninimigo 6
+#define Ninimigo 8
 #define Menu 1
 #define Tutorial 2
 #define GamePlay 3
@@ -161,17 +161,17 @@ public:
 	}
 	void desenhoNaTelaTiro(golpes& objeto, ofVec2f& mundo, monstros& monstro)
 	{
-		/*objeto.angulo = ofRadToDeg(atan2f(objeto.vel.y, objeto.vel.x));
+		objeto.angulo = ofRadToDeg(atan2f(objeto.vel.y, objeto.vel.x));
 		ofPushMatrix();
-		ofTranslate(objeto.posicao);
-		ofRotateZ(objeto.angulo);*/
+		ofTranslate(objeto.posicao - mundo);
+		ofRotateZ(objeto.angulo);
 
 		if (monstro.powerUpActive == false)
-			objeto.sprite.draw(objeto.posicao - mundo);
+			objeto.sprite.draw(0, 0);
 		else
-			objeto.sprite2.draw(objeto.posicao - mundo);
+			objeto.sprite2.draw(0, 0);
 
-		//ofPopMatrix();
+		ofPopMatrix();
 	}
 	void desenhoNaTelaMonstro(monstros& inimigo, ofVec2f& mundo)
 	{
@@ -644,6 +644,23 @@ public:
 		}
 
 	}
+	void boxColisoes(personagem& player, powerUp& damageUp, powerUp& potion, golpes& ataque, monstros& inimigo)
+	{
+		ataque.projetilBox.x = (ataque.posicao.x - ataque.tamanhoX);
+		ataque.projetilBox.y = (ataque.posicao.y - ataque.tamanhoY);
+		player.playerBox.x = (player.posicao.x - player.tamanhoX);
+		player.playerBox.y = (player.posicao.y - player.tamanhoY);
+		damageUp.powerupBox.x = (damageUp.posicao.x - damageUp.tamanhoX);
+		damageUp.powerupBox.y = (damageUp.posicao.y - damageUp.tamanhoY);
+		potion.powerupBox.x = (potion.posicao.x - potion.tamanhoX);
+		potion.powerupBox.y = (potion.posicao.y - potion.tamanhoY);
+		inimigo.mosntrosBox.x = (inimigo.posicao.x - inimigo.tamanhoX);
+		inimigo.mosntrosBox.y = (inimigo.posicao.y - inimigo.tamanhoY);
+		inimigo.mosntrosBox.x = (inimigo.posicao.x - inimigo.tamanhoX);
+		inimigo.mosntrosBox.y = (inimigo.posicao.y - inimigo.tamanhoY);
+		inimigo.mosntrosBox.x = (inimigo.posicao.x - inimigo.tamanhoX);
+		inimigo.mosntrosBox.y = (inimigo.posicao.y - inimigo.tamanhoY);
+	}
 	void playerInGame(personagem& player, monstros& inimigo, double time)
 	{
 		//modulo de som por quantidade que andou
@@ -670,6 +687,7 @@ public:
 	{
 		inimigo.posicao += inimigo.vel * time;
 		inimigo.mosntrosBox.setPosition(inimigo.posicao);
+		animarInimigos(inimigo, player);
 
 		if (damageUp.colidir == false || potion.colidir == false)
 		{
@@ -699,7 +717,7 @@ public:
 	}
 	void BossInGame(monstros& Boss, personagem& player, double time)
 	{
-		//PARTES DE GAMEPLAYS E COLISOES  E TODO O RESTO
+		///Partes de velocidades, colisoes e tiros
 
 		//tempo do som para efeitos
 		Boss.somTime += ofGetLastFrameTime();
@@ -725,7 +743,7 @@ public:
 			Boss.somTime = 0.0f;
 		}
 
-		//ACOES RELACIONADAS COM A VIDA DO BOSS
+		///Acoes relacionadas com a vida do boss
 
 		if (Boss.vida == 800 && player.posicao.x >= 6000)
 		{
