@@ -31,6 +31,8 @@ void ofApp::setup()
 	player.tamanhoYLife = player.lifePlayer.getHeight() / 2;
 	player.sprite.setAnchorPercent(1,1);
 	player.acele = 20.0f;
+	player.dano = 1;
+	player.pontos = 0;
 	player.vida = 400;
 	player.walking.loadSound("Sonorizacao/Player_Running.WAV", true);
 	player.shooting.loadSound("Sonorizacao/Boomerang_Player.WAV", true);
@@ -89,19 +91,19 @@ void ofApp::setup()
 
 	//definicoes boss
 	Boss.posicao.x = 7000;
-	Boss.posicao.y = 700;
+	Boss.posicao.y = 1000;
 	Boss.spriteBoss.loadImage("players/Boss1.png");
 	Boss.Bossbar.loadImage("players/LifeBarBoss.png");
 	Boss.BossLife.loadImage("players/BossLife.png");
 	Boss.BossLife.resize(2, 40);
-	Boss.Bossbar.resize(670, 80);
-	Boss.tamanhoX = Boss.spriteBoss.getWidth() / 4;
+	Boss.Bossbar.resize(540, 80);
+	Boss.tamanhoX = Boss.spriteBoss.getWidth() / 3;
 	Boss.tamanhoY = Boss.spriteBoss.getHeight();
 	Boss.tamanhoXLife = Boss.BossLife.getWidth() / 3;
 	Boss.tamanhoYLife = Boss.BossLife.getHeight();
 	Boss.spriteBoss.setAnchorPoint(Boss.spriteBoss.getWidth() / 3, Boss.spriteBoss.getHeight());
 	Boss.acele = 1.0f;
-	Boss.vida = 1000;
+	Boss.vida = 800;
 	Boss.waveTime = 0;
 	Boss.dano = 1;
 	Boss.IniSub = true;
@@ -185,14 +187,6 @@ void ofApp::update()
 		}
 		if (player.vida > 0)
 		{
-			Boss.somTime += ofGetLastFrameTime();
-			player.tempSom += abs(player.vel.x) + abs(player.vel.y);
-			Boss.Tptime += ofGetLastFrameTime();
-			player.temAnimacao += abs(player.vel.x) + abs(player.vel.y);
-
-			
-			animimarPlayer(player);
-
 			//som de passos
 			/*if (player.tempSom > 30.0f)
 			{
@@ -200,108 +194,54 @@ void ofApp::update()
 			player.tempSom = 0.0f;
 			}*/
 
+			
+			//PLAYER
+			
+			//player no jogo
 
+			//ativando barra de vida do boss
+			if (player.posicao.x > 6000)
+				player.covilBoss = true;
+			//modulo de som por quantidade que andou
+			player.tempSom += abs(player.vel.x) + abs(player.vel.y);
+			//modulo de animacao pela quantidade que andou
+			player.temAnimacao += abs(player.vel.x) + abs(player.vel.y);
+			//animacao
+			animimarPlayer(player);
 			//setando as posicoes x e y mais a velocidade multiplicada pelo tempo
 			player.posicao += (player.dash + player.vel) * time;
-
-			//posicao boss
-			Boss.posicao += Boss.vel * time;
-
-			//camera do player
-			camera = player.posicao - ofVec2f(ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
-
 			// velocidade do tiro multiplicada pelo tempo
 			ataque.posicao += ataque.vel * time;
-			for (int i = 0; i < 4; i++)
-			{
-				ataqueBoss[i].posicao += ataqueBoss[i].vel * time;
-			}
-
+			//camera do player
+			camera = player.posicao - ofVec2f(ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
 			//travando o player na tela em x,y
 			travaTela(player);
-
 			//se a tecla for pressionada o player moviemnta e atira
 			movimento(player, ataque);
 
-			//colisao com o power up
-			for (int i = 0; i < Ninimigo; i++)
-			{
-				inimigo[i].posicao += inimigo[i].vel * time;
-				inimigo[i].mosntrosBox.setPosition(inimigo[i].posicao);
-				if (damageUp.colidir == false || potion.colidir == false)
-				{
-					colisaoPowerUp(player, damageUp, inimigo[i]);
-					colisaoPowerUp(player, potion, inimigo[i]);
-				}
-			}
-
-			//colisao com Boss
-			colisao(player, Boss);
-			playerTiroBoss(Boss, ataque, player);
-
-			for (int i = 0; i < 4; i++)
-			{
-				colisaoTiroBoss(Boss, ataqueBoss[i], player);
-			}
-
-
-			//ALEATORIEDADE DAS FUNCOES
-			for (int i = 0; i < Ninimigo; i++)
-			{
-				if (inimigo[i].vida > 0)
-				{
-
-					colisao(player, inimigo[i]);
-					if (ataque.Tiro == true)
-					{
-						colisaoTiro(inimigo[i], ataque, player);
-						if (inimigo[i].vida <= 0)
-							sorteioDrop(inimigo[i]);
-					}
-					//Inimigo andando pela tela para cima e baixo
-					movimentoInimigo(inimigo[i], player);
-
-					if (inimigo[i].vida <= 10)
-					{
-						inimigo[i].dano = 4;
-						inimigo[i].acele = 200.0f;
-						monstroSeguir(player, inimigo[i]);
-					}
-				}
-			}
-			if (Boss.somTime > 10.0f)
-			{
-				Boss.scream.play();
-				Boss.somTime = 0.0f;
-			}
-			//tiro do boss saindo em direcao ao player de tempos em tempos
-			if (Boss.vida >= 600 && player.posicao.x >= 6000)
-			{
-				movimentoBoss(Boss);
-				for (int i = 0; i < 4; i++)
-				{
-					iddle1(Boss, ataqueBoss[i]);
-				}
-			}
-			else if (Boss.vida <= 600)
-			{
-
-				Boss.vel.limit(50);
-				monstroSeguir(player, Boss);
-				Boss.dano = 2;
-				for (int i = 0; i < 4; i++)
-				{
-					iddle1(Boss, ataqueBoss[i]);
-				}
-			}
-			if (Boss.vida <= 60 && player.vida <= 80)
-				BossDrop(Boss, potion);
-
-
-
-
 			//Dash parando
 			updateVector(player.dash, time);
+
+			//INIMIGOS E JOGADOR
+
+			//Inimigos e jogador no jogo 
+			for (int i = 0; i < Ninimigo; i++)
+			{
+				//player no jogo ainda em testes
+				//playerInGame(player, inimigo[i], time);
+				inimigosInGame(inimigo[i], player, time);
+			}
+
+			//BOSS
+
+			//Boss no jogo
+			BossInGame(Boss, player, time);
+			if (Boss.tempAnimacao > 900.0f)
+			{
+				Boss.frame += 1;
+				if (Boss.frame > 3)
+					Boss.frame = 0;
+			}
 		}
 		break;
 	}
@@ -356,7 +296,6 @@ void ofApp::draw()
 				player.lifePlayer.draw(100 + (i * player.tamanhoXLife), 110);
 				if (player.vida >= 400)
 					player.vida = 400;
-
 			}
 			if (player.continues >= 3)
 				player.lifeBarPlayer.draw(10, 80);
@@ -365,11 +304,15 @@ void ofApp::draw()
 			else
 				player.lifeBarPlayer3.draw(10, 80);
 
-			/*for (int i = 0; i < Boss.vida; i++)
+			//Barra de vida do Boss
+			if (player.covilBoss == true)
 			{
-			Boss.BossLife.draw(10 + (i * Boss.tamanhoXLife), 120);
+				for (int i = 0; i < Boss.vida; i++)
+				{
+					Boss.BossLife.draw(480 + (i * Boss.tamanhoXLife), 80);
+				}
+				Boss.Bossbar.draw(480, 80);
 			}
-			Boss.Bossbar.draw(10,120);*/
 
 			//HUD ENEMYS
 			for (int i = 0; i < Ninimigo; i++)
@@ -388,15 +331,13 @@ void ofApp::draw()
 			
 
 			desenhoNaTela(player, camera);
+			
 
+
+			//Desenhando inimigos e do tiro do player
 			for (int i = 0; i < Ninimigo; i++)
 			{
 				desenhoNaTelaTiro(ataque, camera, inimigo[i]);
-			}
-
-			//Desenhando inimigos
-			for (int i = 0; i < Ninimigo; i++)
-			{
 				if (inimigo[i].vida > 0)
 				{
 					desenhoNaTelaMonstro(inimigo[i], camera);
@@ -405,12 +346,6 @@ void ofApp::draw()
 			//desenhando o Boss com animacao
 			if (Boss.vida > 0)
 			{
-				if (Boss.tempAnimacao > 600.0f)
-				{
-					Boss.frame += 1;
-					if (Boss.frame > 4)
-						Boss.frame = 0;
-				}
 				desenhoNaTelaBoss(Boss, camera);
 				for (int i = 0; i < 4; i++)
 				{
@@ -563,7 +498,7 @@ void ofApp::keyPressed(int key)
 
 		if (key == 's')
 		{
-			player.vida = 300;
+			player.vida = 400;
 			player.posicao.x = 600;
 			player.posicao.y = 700;
 			estadoJogo = GamePlay;

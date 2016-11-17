@@ -61,9 +61,10 @@ public:
 		ofRectangle playerBox;
 		float tamanhoX, tamanhoY, tamanhoXLife, tamanhoYLife, temAnimacao;
 		float acele, tempSom, animacao, frame;
-		int vida, pontos = 0, dano = 1, continues;
+		int vida, pontos, dano, continues;
 		bool Up = false; bool Down = false; bool Right = false; bool Left = false; bool Tiro = false;
-		bool acompanhando = false; bool tiroDirecao = false; bool colison = false; bool dashY; bool dashX;
+		bool acompanhando = false; bool tiroDirecao = false; bool colison = false;
+		bool covilBoss =  false;
 
 	};
 	personagem player;
@@ -113,7 +114,7 @@ public:
 		bool IniSub = false;
 		bool IniDesc = false;
 		bool IniDir = false; bool IniEsq = false; bool atingido = false;
-		bool powerUpActive = false; bool waveOn = false;
+		bool powerUpActive = false; bool waveOn = false; 
 	};
 
 
@@ -160,7 +161,8 @@ public:
 	}
 	void desenhoNaTelaTiro(golpes& objeto, ofVec2f& mundo, monstros& monstro)
 	{
-		/*ofPushMatrix();
+		/*objeto.angulo = ofRadToDeg(atan2f(objeto.vel.y, objeto.vel.x));
+		ofPushMatrix();
 		ofTranslate(objeto.posicao);
 		ofRotateZ(objeto.angulo);*/
 
@@ -168,6 +170,8 @@ public:
 			objeto.sprite.draw(objeto.posicao - mundo);
 		else
 			objeto.sprite2.draw(objeto.posicao - mundo);
+
+		//ofPopMatrix();
 	}
 	void desenhoNaTelaMonstro(monstros& inimigo, ofVec2f& mundo)
 	{
@@ -182,7 +186,7 @@ public:
 
 	void desenhoNaTelaBoss(monstros& inimigo, ofVec2f& mundo)
 	{
-		inimigo.spriteBoss.drawSubsection(inimigo.posicao.x - mundo.x, inimigo.posicao.y - mundo.y, inimigo.tamanhoX, inimigo.tamanhoY, inimigo.animaTime * 0, 0);
+		inimigo.spriteBoss.drawSubsection(inimigo.posicao.x - mundo.x, inimigo.posicao.y - mundo.y, inimigo.tamanhoX, inimigo.tamanhoY, inimigo.tamanhoX *inimigo.frame, inimigo.tamanhoY * inimigo.animacao);
 	}
 
 	//parando o dash para não ser infinito
@@ -338,7 +342,7 @@ public:
 	{
 		boss.waitTime += 1;
 		tiroBossSeguir(player, atakBoss);
-		if (Boss.vida >= 60)
+		if (Boss.vida >= 600)
 		{
 			atakBoss.vel.limit(500);
 			if (boss.waitTime >= 15)
@@ -350,15 +354,13 @@ public:
 				boss.waitTime = 0;
 			}
 		}
-		else if (Boss.vida < 60 && Boss.vida >= 30)
+		else if (Boss.vida < 200)
 		{
-			atakBoss.vel.limit(600);
+			atakBoss.vel.limit(700);
 			if (boss.waitTime >= 25)
 			{
 				posTiroBoss(ataqueBoss[0], boss);
 				posTiroBoss(ataqueBoss[1], boss);
-				posTiroBoss(ataqueBoss[2], boss);
-				posTiroBoss(ataqueBoss[3], boss);
 				boss.waitTime = 0;
 			}
 		}
@@ -377,7 +379,7 @@ public:
 		}
 		else if (sorteio > 50 && sorteio < 150)
 		{
-			inimigo.powerUpActive = false;
+			//inimigo.powerUpActive = false;
 			potion.posicao = inimigo.posicao;
 			potion.Ingame = true;
 			potion.cure = true;
@@ -390,8 +392,8 @@ public:
 		if (sort < 25)
 		{
 			potion.vida = (60 + rand() % 100);
-			Boss.powerUpActive = false;
-			potion.posicao.x = (620);
+			//Boss.powerUpActive = false;
+			potion.posicao.x = (6200);
 			potion.posicao.y = (500);
 			potion.Ingame = true;
 			potion.cure = true;
@@ -614,15 +616,17 @@ public:
 			Boss.Tptime = 0.0f;
 		}
 	}
+
 	void movimentoBoss(monstros& Boss)
 	{
-		Boss.vel.limit(200);
+		Boss.vel.limit(300);
 		if (Boss.IniSub == true)
 		{
 			Boss.vel.y -= Boss.acele;
 			if (Boss.posicao.y < 400)
 			{
-				Boss.vel.set(1, 1);
+				Boss.vel.set(0,0);
+				Boss.posicao.y += 4;
 				Boss.IniSub = false;
 				Boss.IniDesc = true;
 			}
@@ -632,12 +636,126 @@ public:
 			Boss.vel.y += Boss.acele;
 			if (Boss.posicao.y > 1100)
 			{
-				Boss.vel.set(1, 1);
+				Boss.vel.set(0, 0);
+				Boss.posicao.y -= 4;
 				Boss.IniSub = true;
 				Boss.IniDesc = false;
 			}
 		}
 
 	}
+	void playerInGame(personagem& player, monstros& inimigo, double time)
+	{
+		//modulo de som por quantidade que andou
+		player.tempSom += abs(player.vel.x) + abs(player.vel.y);
+		//modulo de animacao pela quantidade que andou
+		player.temAnimacao += abs(player.vel.x) + abs(player.vel.y);
+		//animacao
+		animimarPlayer(player);
+		//setando as posicoes x e y mais a velocidade multiplicada pelo tempo
+		player.posicao += (player.dash + player.vel) * time;
+		// velocidade do tiro multiplicada pelo tempo
+		ataque.posicao += ataque.vel * time;
+		//camera do player
+		camera = player.posicao - ofVec2f(ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
+		//travando o player na tela em x,y
+		travaTela(player);
+		//se a tecla for pressionada o player moviemnta e atira
+		movimento(player, ataque);
 
+		//Dash parando
+		updateVector(player.dash, time);
+	}
+	void inimigosInGame(monstros& inimigo, personagem& player, double time)
+	{
+		inimigo.posicao += inimigo.vel * time;
+		inimigo.mosntrosBox.setPosition(inimigo.posicao);
+
+		if (damageUp.colidir == false || potion.colidir == false)
+		{
+			colisaoPowerUp(player, damageUp, inimigo);
+			colisaoPowerUp(player, potion, inimigo);
+		}
+
+		if (inimigo.vida > 0)
+		{
+			colisao(player, inimigo);
+			if (ataque.Tiro == true)
+			{
+				colisaoTiro(inimigo, ataque, player);
+				if (inimigo.vida <= 0)
+					sorteioDrop(inimigo);
+			}
+			//Inimigo andando pela tela para cima e baixo
+			movimentoInimigo(inimigo, player);
+
+			if (inimigo.vida <= 10)
+			{
+				inimigo.dano = 3;
+				inimigo.acele = 180.0f;
+				monstroSeguir(player, inimigo);
+			}
+		}
+	}
+	void BossInGame(monstros& Boss, personagem& player, double time)
+	{
+		//PARTES DE GAMEPLAYS E COLISOES  E TODO O RESTO
+
+		//tempo do som para efeitos
+		Boss.somTime += ofGetLastFrameTime();
+		//temo do teleporte do boss
+		Boss.Tptime += ofGetLastFrameTime();
+		//modulo de animacao por quantidade que andou
+		Boss.tempAnimacao += abs(Boss.vel.x) + abs(Boss.vel.y);
+		//posicao boss
+		Boss.posicao += Boss.vel * time;
+		//tiros do boss com velocidade multiplicada pelo tempo e colisao com os tiros no player
+		for (int i = 0; i < 4; i++)
+		{
+			ataqueBoss[i].posicao += ataqueBoss[i].vel * time;
+			colisaoTiroBoss(Boss, ataqueBoss[i], player);
+		}
+		//colisao com Boss
+		colisao(player, Boss);
+		playerTiroBoss(Boss, ataque, player);
+		//Som dos boss na fase
+		if (Boss.somTime > 10.0f)
+		{
+			Boss.scream.play();
+			Boss.somTime = 0.0f;
+		}
+
+		//ACOES RELACIONADAS COM A VIDA DO BOSS
+
+		if (Boss.vida == 800 && player.posicao.x >= 6000)
+		{
+			movimentoBoss(Boss);
+			for (int i = 0; i < 4; i++)
+			{
+				iddle1(Boss, ataqueBoss[i]);
+			}
+		}
+		else if (Boss.vida <= 500)
+		{
+			Boss.vel.limit(200);
+			monstroSeguir(player, Boss);
+			Boss.dano = 2;
+			for (int i = 0; i < 4; i++)
+			{
+				iddle1(Boss, ataqueBoss[i]);
+			}
+		}
+		else if (Boss.vida <= 200)
+		{
+			Boss.vel.limit(300);
+			monstroSeguir(player, Boss);
+			Boss.dano = 3;
+			for (int i = 0; i < 2; i++)
+			{
+				iddle1(Boss, ataqueBoss[i]);
+			}
+		}
+		if (Boss.vida <= 500 && player.vida <= 80)
+			BossDrop(Boss, potion);
+	}
 };
