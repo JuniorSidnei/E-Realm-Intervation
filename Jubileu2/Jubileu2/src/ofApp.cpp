@@ -29,7 +29,7 @@ void ofApp::setup()
 	player.tamanhoX = player.sprite.getWidth() / 9;
 	player.tamanhoXLife = player.lifePlayer.getWidth() / 2;
 	player.tamanhoYLife = player.lifePlayer.getHeight() / 2;
-	player.sprite.setAnchorPoint(player.tamanhoXLife, player.tamanhoY);
+	player.sprite.setAnchorPercent(1,1);
 	player.acele = 20.0f;
 	player.vida = 400;
 	player.walking.loadSound("Sonorizacao/Player_Running.WAV", true);
@@ -39,16 +39,18 @@ void ofApp::setup()
 	//definicoes powerUp de dano
 	damageUp.dano = 2;
 	damageUp.damage.loadImage("players/PowerUpForca.png");
-	damageUp.damage.setAnchorPoint(damageUp.damage.getWidth() / 2, damageUp.damage.getHeight() / 2);
+	damageUp.damage.setAnchorPercent(0.5,0.5);
 	damageUp.tamanhoY = damageUp.damage.getHeight() / 2;
 	damageUp.tamanhoX = damageUp.damage.getWidth() / 2;
+	damageUp.powerupBox.setSize(damageUp.tamanhoX, damageUp.tamanhoY);
 
 	//definicoes da cura
 	potion.heal.loadImage("players/PocaoVida.png");
-	potion.heal.setAnchorPoint(potion.heal.getWidth() / 2, potion.heal.getHeight() / 2);
+	potion.heal.setAnchorPercent(0.5,0.5);
 	potion.tamanhoY = potion.heal.getHeight() / 2;
 	potion.tamanhoX = potion.heal.getWidth() / 2;
 	potion.vida = (20 + (rand() % 40));
+	potion.powerupBox.setSize(potion.tamanhoX, potion.tamanhoY);
 
 	//definicoes padrao dos inimigos por vetores
 	for (int i = 0; i < Ninimigo; i++)
@@ -63,9 +65,9 @@ void ofApp::setup()
 		inimigo[i].tamanhoX = inimigo[i].sprite.getWidth() / 3;
 		inimigo[i].tamanhoXLife = inimigo[i].EnemyLife.getWidth();
 		inimigo[i].tamanhoYLife = inimigo[i].EnemyLife.getHeight();
-		inimigo[i].sprite.setAnchorPercent(0.5, 0.5);
-		inimigo[i].sprite2.setAnchorPercent(0.5, 0.5);
-		inimigo[i].sprite3.setAnchorPercent(0.5, 0.5);
+		inimigo[i].sprite.setAnchorPercent(0.1,-0.1);
+		inimigo[i].sprite2.setAnchorPercent(0.1, -0.1);
+		inimigo[i].sprite3.setAnchorPercent(0.1, -0.1);
 		inimigo[i].acele = 1.0f;
 		inimigo[i].IniSub = true;
 		inimigo[i].vida = 30;
@@ -108,10 +110,10 @@ void ofApp::setup()
 	//definicoes do tiro
 	ataque.sprite.loadImage("players/armaPlayer.png");
 	ataque.sprite2.loadImage("players/armaPlayerUp1.png");
-	ataque.tamanhoX = ataque.sprite.getHeight();
-	ataque.tamanhoY = ataque.sprite.getWidth() ;
-	ataque.sprite.setAnchorPercent(0.5, 0.5);
-	ataque.sprite2.setAnchorPercent(0.5, 0.5);
+	ataque.tamanhoX = ataque.sprite.getHeight() / 2;
+	ataque.tamanhoY = ataque.sprite.getWidth() / 2;
+	ataque.sprite.setAnchorPoint(ataque.tamanhoX, ataque.tamanhoY);
+	ataque.sprite2.setAnchorPoint(ataque.tamanhoX, ataque.tamanhoY);
 	ataque.acele = 950.0f;
 	ataque.acompanhando = true;
 	ataque.projetilBox.setSize(ataque.sprite.getWidth(), ataque.sprite.getHeight());
@@ -163,11 +165,24 @@ void ofApp::update()
 	case GamePlay:
 		
 		//setando a caixa de colisao exatamente a partir do centro da imagem
-		ataque.projetilBox.x = (ataque.posicao.x - ataque.sprite.getWidth() / 2);
-		ataque.projetilBox.y = (ataque.posicao.y - ataque.sprite.getHeight() / 2);
-		player.playerBox.x = (player.posicao.x - player.sprite.getWidth() / 2);
-		player.playerBox.y = (player.posicao.y - player.sprite.getHeight() / 2);
-
+		ataque.projetilBox.x = (ataque.posicao.x - ataque.tamanhoX);
+		ataque.projetilBox.y = (ataque.posicao.y - ataque.tamanhoY);
+		player.playerBox.x = (player.posicao.x - player.tamanhoX);
+		player.playerBox.y = (player.posicao.y - player.tamanhoY);
+		damageUp.powerupBox.x = (damageUp.posicao.x - damageUp.tamanhoX);
+		damageUp.powerupBox.y = (damageUp.posicao.y - damageUp.tamanhoY);
+		potion.powerupBox.x = (potion.posicao.x - potion.tamanhoX);
+		potion.powerupBox.y = (potion.posicao.y - potion.tamanhoY);
+		for (int i = 0; i < Ninimigo; i++)
+		{
+			animarInimigos(inimigo[i], player);
+			inimigo[i].mosntrosBox.x = (inimigo[i].posicao.x - inimigo[i].tamanhoX);
+			inimigo[i].mosntrosBox.y = (inimigo[i].posicao.y - inimigo[i].tamanhoY);
+			inimigo[i].mosntrosBox.x = (inimigo[i].posicao.x - inimigo[i].tamanhoX);
+			inimigo[i].mosntrosBox.y = (inimigo[i].posicao.y - inimigo[i].tamanhoY);
+			inimigo[i].mosntrosBox.x = (inimigo[i].posicao.x - inimigo[i].tamanhoX);
+			inimigo[i].mosntrosBox.y = (inimigo[i].posicao.y - inimigo[i].tamanhoY);
+		}
 		if (player.vida > 0)
 		{
 			Boss.somTime += ofGetLastFrameTime();
@@ -175,16 +190,7 @@ void ofApp::update()
 			Boss.Tptime += ofGetLastFrameTime();
 			player.temAnimacao += abs(player.vel.x) + abs(player.vel.y);
 
-			for (int i = 0; i < Ninimigo; i++)
-			{
-				animarInimigos(inimigo[i], player);
-				inimigo[i].mosntrosBox.x = (inimigo[i].posicao.x - inimigo[i].sprite.getWidth() / 2);
-				inimigo[i].mosntrosBox.y = (inimigo[i].posicao.y - inimigo[i].sprite.getHeight() / 2);
-				inimigo[i].mosntrosBox.x = (inimigo[i].posicao.x - inimigo[i].sprite2.getWidth() / 2);
-				inimigo[i].mosntrosBox.y = (inimigo[i].posicao.y - inimigo[i].sprite2.getHeight() / 2);
-				inimigo[i].mosntrosBox.x = (inimigo[i].posicao.x - inimigo[i].sprite3.getWidth() / 2);
-				inimigo[i].mosntrosBox.y = (inimigo[i].posicao.y - inimigo[i].sprite3.getHeight() / 2);
-			}
+			
 			animimarPlayer(player);
 
 			//som de passos
@@ -333,9 +339,16 @@ void ofApp::draw()
 
 			//fundo do jogo
 			desenhoNaTelaFundo(fundo, camera);
+			//power up desenhado na tela apos o inimigo morrer
+			if (damageUp.Ingame == true)
+				desenhoPowerUpDamage(damageUp, camera);
+			else if (potion.Ingame == true)
+				desenhoPowerUpPotion(potion, camera);
 
-			ofDrawRectangle(ataque.projetilBox - camera);
-			ofDrawRectangle(player.playerBox - camera);
+			//ofDrawRectangle(ataque.projetilBox - camera);
+			//ofDrawRectangle(player.playerBox - camera);
+			//ofDrawRectangle(damageUp.powerupBox - camera);
+			//ofDrawRectangle(potion.powerupBox - camera);
 
 			//HUD
 			for (int i = 0; i < player.vida; i++)
@@ -361,7 +374,7 @@ void ofApp::draw()
 			//HUD ENEMYS
 			for (int i = 0; i < Ninimigo; i++)
 			{
-				ofDrawRectangle(inimigo[i].mosntrosBox - camera);
+				/*ofDrawRectangle(inimigo[i].mosntrosBox - camera);*/
 				if (inimigo[i].vida > 0)
 				{
 					for (int j = 0; j < inimigo[i].vida; j++)
@@ -372,11 +385,7 @@ void ofApp::draw()
 				}
 			}
 
-			//power up desenhado na tela apos o inimigo morrer
-			if (damageUp.Ingame == true)
-				desenhoPowerUpDamage(damageUp, camera);
-			else if (potion.Ingame == true)
-				desenhoPowerUpPotion(potion, camera);
+			
 
 			desenhoNaTela(player, camera);
 

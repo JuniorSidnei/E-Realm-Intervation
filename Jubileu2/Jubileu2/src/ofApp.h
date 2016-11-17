@@ -41,7 +41,7 @@ public:
 	ofImage FundoMenu;
 
 
-	int estadoJogo = Menu;
+	int estadoJogo = GamePlay;
 
 	//personagem completo
 	struct personagem
@@ -86,6 +86,7 @@ public:
 		ofVec2f posicao;
 		ofImage damage;
 		ofImage heal;
+		ofRectangle powerupBox;
 	};
 	powerUp damageUp;
 	powerUp potion;
@@ -220,9 +221,11 @@ public:
 	{
 
 		//Colisao certa
-		if (P1.posicao.x > P2.posicao.x - P2.tamanhoX && P1.posicao.x < P2.posicao.x + P2.tamanhoX &&
+		/*if (P1.posicao.x > P2.posicao.x - P2.tamanhoX && P1.posicao.x < P2.posicao.x + P2.tamanhoX &&
 			P1.posicao.y + P1.tamanhoY > P2.posicao.y - P2.tamanhoY &&
-			P1.posicao.y - P1.tamanhoY < P2.posicao.y + P2.tamanhoY)
+			P1.posicao.y - P1.tamanhoY < P2.posicao.y + P2.tamanhoY)*/
+		//if(P2.posicao.distance(P1.posicao) < 150)
+		if(P1.playerBox.intersects(P2.mosntrosBox))
 		{
 			//Se colidir perde vida
 			P1.vida -= P2.dano;
@@ -234,9 +237,10 @@ public:
 	{
 
 		//Colisao certa
-		if (P1.posicao.x > P2.posicao.x - P2.tamanhoX && P1.posicao.x < P2.posicao.x + P2.tamanhoX &&
+		/*if (P1.posicao.x > P2.posicao.x - P2.tamanhoX && P1.posicao.x < P2.posicao.x + P2.tamanhoX &&
 			P1.posicao.y + P1.tamanhoY > P2.posicao.y - P2.tamanhoY &&
-			P1.posicao.y - P1.tamanhoY < P2.posicao.y + P2.tamanhoY)
+			P1.posicao.y - P1.tamanhoY < P2.posicao.y + P2.tamanhoY)*/
+		if(P1.playerBox.intersects(P2.powerupBox))
 		{
 			P2.colidir = true;
 			P2.Ingame = false;
